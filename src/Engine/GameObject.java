@@ -5,9 +5,11 @@ import java.util.List;
 
 public class GameObject
 {
-    //该Object包含的所有的组件
-    private List<Component> components = new ArrayList<Component>();
-    private String name;
+    private List<Component> components = new ArrayList<Component>();//该Object包含的所有的组件
+    private String name;//该Object的名字
+
+    private GameObject parent;//该GameObject的父GameObject
+    private List<GameObject> children = new ArrayList<>();//该GameObject的子GameObject
 
     private boolean isAwaken=false;//是否已经调用过awake()
     private boolean isStarted=false;//是否已经调用过start()
@@ -20,11 +22,41 @@ public class GameObject
 
     /**
      * 获取GameObject的name
-     * @return
+     * @return GameObject.name
      */
     public String getName()
     {
         return name;
+    }
+
+    public GameObject getParent()
+    {
+        return parent;
+    }
+
+    public List<GameObject> getChildren()
+    {
+        return children;
+    }
+
+    public void addChild(GameObject child)
+    {
+        //如果child为空或者children中已经有child则不执行代码
+        if(child==null||children.contains(child))
+            return;
+        //如果child已经有了一个parent，则移除原parent，添加本对象为parent
+        if(child.parent!=null)
+        {
+            child.parent.children.remove(child);
+        }
+        children.add(child);
+        child.parent=this;
+    }
+    public void setParent(GameObject parent)
+    {
+        if(parent==null||this.parent==parent)
+            return;
+        parent.addChild(this);
     }
 
 
@@ -97,6 +129,11 @@ public class GameObject
             component.awake();
             component.markAwaken();
         }
+        //让子Object调用awake()
+        for(GameObject child : children)
+        {
+            child.awake();
+        }
         isAwaken=true;
     }
     public void start()
@@ -107,6 +144,11 @@ public class GameObject
         {
             component.start();
             component.markStarted();
+        }
+        //子O调用
+        for(GameObject child : children)
+        {
+            child.start();
         }
         isStarted=true;
     }
@@ -119,6 +161,10 @@ public class GameObject
             {
                 component.update();
             }
+        }
+        for(GameObject child : children)
+        {
+            child.update();
         }
     }
 }
