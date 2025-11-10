@@ -4,6 +4,31 @@ import javax.swing.*;
 public class GameManager extends Component
 {
     private static GameManager instance;
+    private JFrame frame;
+    private Chessboard board;
+
+    /**
+     * GameManager负责管理游戏的唯一JFrame,获取JFrame的唯一入口
+     * @return 游戏界面的JFrame
+     */
+    public JFrame getFrame()
+    {
+        return frame;
+    }
+
+    /**
+     * 获取棋盘的唯一入口
+     * @return 棋盘
+     */
+    public Chessboard getBoard()
+    {
+        return board;
+    }
+
+    /**
+     * 获取GameManager单例
+     * @return
+     */
     public static GameManager getInstance()
     {
         if (instance == null)
@@ -18,29 +43,31 @@ public class GameManager extends Component
         }
         return instance;
     }
-    JLabel title;
 
     private GameManager()
     {
         if(instance !=null)
             throw new RuntimeException("Please use singleton GameManager.getInstance()");
+        register();
     }
+
+    public void awake()
+    {
+        System.out.println("This is GameManager's awake");
+        frame = new JFrame("Chessboard");
+        frame.setSize(800, 600);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+        board = new Chessboard();
+    }
+
     public void start()
     {
         //测试
-        JFrame frame = new JFrame();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setTitle("Chessboard");
-        frame.setVisible(true);
-        frame.setSize(800, 600);
-        title = new JLabel("Chessboard");
-        title.setHorizontalTextPosition(JLabel.CENTER);                                    //设置文本相对于图像的水平位置
-        title.setVerticalTextPosition(JLabel.BOTTOM);
-        frame.add(title);
+        //System.out.println("This is GameManager's start");
     }
     public void update()
     {
-        //测试
-        title.setText(Long.toString(System.currentTimeMillis()));
+        //System.out.println("This is GameManager's update");
     }
 }

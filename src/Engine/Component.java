@@ -5,12 +5,11 @@ public abstract class Component implements GameBehavior
     private String name;
     private boolean isEnabled = true;
     private boolean isStarted = false;
+    private boolean isAwaken = false;
 
     public Component()
     {
-        GameEngine.getInstance().registerComponent(this);
         this.name = this.getClass().getSimpleName();
-        this.awake();
     }
 
     @Override
@@ -27,16 +26,25 @@ public abstract class Component implements GameBehavior
     public void awake()
     {
     }
+    public void register()
+    {
+        GameEngine.getInstance().registerComponent(this);
+    }
 
     public boolean isEnabled()
     {
         return isEnabled;
     }
+    protected boolean isAwaken(){return isAwaken;}
     public void setEnabled(boolean enabled)
     {
         isEnabled = enabled;
     }
 
+    public void markAwaken()
+    {
+        isAwaken = true;
+    }
     protected boolean isStarted() {return isStarted;}
     protected void markStarted(){isStarted = true;}
 }
