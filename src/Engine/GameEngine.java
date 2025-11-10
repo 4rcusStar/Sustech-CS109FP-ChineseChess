@@ -1,15 +1,12 @@
 package Engine;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class GameEngine
 {
     private static GameEngine instance;
-    private List<Component> componentsList = new ArrayList<>();
-    private List<Component> componentsToStart = new ArrayList<>();
-    private List<Component> componentsToAwaken = new ArrayList<>();
+    private List<GameObject> gameObjects = new ArrayList<>();
     private boolean isRunning = false;
     private long lastUpdateTime = 0;
     private final int targetFPS = 60;
@@ -31,13 +28,11 @@ public class GameEngine
 
     /**
      * 注册游戏行为
-     * @param component 将要注册到引擎上的组件
+     * @param gameObject 将要注册到引擎上的组件
      */
-    public void registerComponent(Component component)
+    public void registerGameObject(GameObject gameObject)
     {
-        componentsList.add(component);
-        componentsToAwaken.add(component);
-        componentsToStart.add(component);
+        gameObjects.add(gameObject);
     }
 
     public void runEngine()
@@ -57,69 +52,18 @@ public class GameEngine
 
             while(isRunning)
             {
-                //每帧检查是否有新的组件需要调用awake()并调用
-                if(!componentsToAwaken.isEmpty())
+                //调用所有GO的awake()->调用所有start()->调用所有update()
+                for (GameObject obj : gameObjects)
                 {
-                    // 创建副本，避免并发修改
-                    List<Component> currentBatch = new ArrayList<>(componentsToAwaken);
-                    componentsToAwaken.clear();  // 立即清空原列表
-                    for(Component component : currentBatch)
-                    {
-                        if(component.isEnabled())
-                        {
-                            try
-                            {
-                                component.awake();
-                                component.markAwaken();
-                                System.out.println("Awaken: " + component.getName());
-                            }
-                            catch(Exception e)
-                            {
-                                System.err.println("Awake failed for " + component.getName() + ": " + e.getMessage());
-                            }
-                        }
-                    }
-                    continue;
+                    obj.awake();
                 }
-                //每帧检查是否有新的组件需要调用start()并调用
-                if(!componentsToStart.isEmpty())
+                for(GameObject obj : gameObjects)
                 {
-                    List<Component> currentBatch = new ArrayList<>(componentsToStart);
-                    componentsToStart.clear();
-                    //使用iterator遍历组件，执行start()并删除
-                    for (Component component : currentBatch)
-                    {
-                        //只对激活的组件生效
-                        if (component.isEnabled() && component.isAwaken())
-                        {
-                            try
-                            {
-                                component.start();
-                                component.markStarted();
-                            } catch (Exception e)
-                            {
-                                System.err.println("Start failed for " + component.getName() + ": " + e.getMessage());
-                            }
-                        }
-                    }
-                    continue;
+                    obj.start();
                 }
-                //每帧检查是否有组件被destroy()并调用onDestroy()
-                //对已经start()过并enable的组件调用update()
-                List<Component> currentComponents = new ArrayList<>(componentsList);
-                for(Component component:currentComponents)
+                for(GameObject obj : gameObjects)
                 {
-                    //等待所有组件均被Awake后才Update
-                    if(component.isEnabled()&& component.isStarted())
-                    {
-                        try
-                        {
-                            component.update();
-                        } catch (Exception e)
-                        {
-                            System.err.println(component.getName()+"FailedToUpdate:"+e.getMessage());
-                        }
-                    }
+                    obj.update();
                 }
                 //帧率控制
                 currentTime = System.currentTimeMillis();

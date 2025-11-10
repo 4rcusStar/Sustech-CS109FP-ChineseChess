@@ -16,10 +16,13 @@ public interface GameBehavior
      */
     default void update(){};
 
-  /*  *//**
-     * 被摧毁时调用
-     *//*
-    default void onDestroy(){};*/
+    /*
+     * 被摧毁时调用*/
+
+    default void onDestroy()
+    {
+    }
+
 
     /**
      * 获取实例名称

@@ -3,6 +3,7 @@ package Engine;
 public abstract class Component implements GameBehavior
 {
     private String name;
+    private GameObject attachedGameObject;
     private boolean isEnabled = true;
     private boolean isStarted = false;
     private boolean isAwaken = false;
@@ -10,6 +11,16 @@ public abstract class Component implements GameBehavior
     public Component()
     {
         this.name = this.getClass().getSimpleName();
+    }
+
+    public void setGameObject(GameObject gameObject)
+    {
+        attachedGameObject = gameObject;
+    }
+
+    public GameObject getGameObject()
+    {
+        return attachedGameObject;
     }
 
     @Override
@@ -26,11 +37,6 @@ public abstract class Component implements GameBehavior
     public void awake()
     {
     }
-    public void register()
-    {
-        GameEngine.getInstance().registerComponent(this);
-    }
-
     public boolean isEnabled()
     {
         return isEnabled;

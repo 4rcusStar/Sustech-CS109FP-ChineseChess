@@ -3,7 +3,7 @@ import javax.swing.*;
 
 public class Chessboard extends Component
 {
-    private GameManager gameManager = GameManager.getInstance();
+    private final LogicManager logicManager = LogicManager.getInstance();
     private JFrame frame;
     private JPanel board;
     private JLabel roundStatus;
@@ -12,21 +12,11 @@ public class Chessboard extends Component
     static final int BOARD_HEIGHT = 9;
     private ChessPiece[][] coord = new ChessPiece[BOARD_WIDTH][BOARD_HEIGHT];
 
-    public Chessboard()
-    {
-        register();
-    }
+
 
     public void awake()
     {
-        //System.out.println("This is Chessboard's Awake");
-        frame = gameManager.getFrame();
-        board = new JPanel();
-        board.setLayout(null);
-        frame.add(board);
-        roundStatus = new JLabel("Your Turn!");
-        roundStatus.setBounds(350, 200, 150, 100);
-        board.add(roundStatus);
+        System.out.println(getName()+" Awake");
         createChessPieces();
     }
 
@@ -36,8 +26,6 @@ public class Chessboard extends Component
     void createChessPieces()
     {
         //TODO:添加完整的一套棋子以完成游戏初始化
-        TestChessPiece testChessPiece = new TestChessPiece(ChessPieceSide.RED);
-        addChessPiece(testChessPiece,0,0);
     }
 
     /**
@@ -123,15 +111,12 @@ public class Chessboard extends Component
 
     public void start()
     {
-        //System.out.println("This is Chessboard's Start");
-        //调试：
-        printBoard();
-        getChessPiece(0,0).moveTo(1,1);
-        printBoard();
+        //System.out.println(getName()+" Start");
     }
 
     public void update()
     {
+        //System.out.println(getName()+" Update");
         //System.out.println("This is Chessboard's Update");
     }
 }

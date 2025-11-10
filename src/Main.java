@@ -1,12 +1,14 @@
 import Engine.GameEngine;
+import Engine.GameObject;
 
 class Main
 {
-    static GameManager manager= GameManager.getInstance();
     static GameEngine engine = GameEngine.getInstance();
     public static void main(String[] args)
     {
-        manager = GameManager.getInstance();
+        GameObject gameManager = new GameObject("GameManager");
+        gameManager.addComponent(new LogicManager());
+        engine.registerGameObject(gameManager);
         engine.runEngine();
     }
 }
