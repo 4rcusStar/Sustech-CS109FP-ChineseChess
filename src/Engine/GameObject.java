@@ -18,6 +18,9 @@ public class GameObject
     public GameObject(String name)
     {
         this.name = name;
+        Transform transform= new Transform();
+        this.addComponent(transform);
+        //
     }
 
     /**
@@ -51,6 +54,21 @@ public class GameObject
         }
         children.add(child);
         child.parent=this;
+    }
+
+    /**
+     * 通过name获取子一层GameObject
+     * @param name 目标的name
+     * @return 目标GameObject,若找不到则返回null
+     */
+    public GameObject getChild(String name)
+    {
+        for(GameObject child:children)
+        {
+            if(child.getName().equals(name))
+                return child;
+        }
+        return null;
     }
     public void setParent(GameObject parent)
     {

@@ -3,11 +3,6 @@ import javax.swing.*;
 
 public class Chessboard extends Component
 {
-    private final LogicManager logicManager = LogicManager.getInstance();
-    private JFrame frame;
-    private JPanel board;
-    private JLabel roundStatus;
-
     static final int BOARD_WIDTH = 9;
     static final int BOARD_HEIGHT = 9;
     private ChessPiece[][] coord = new ChessPiece[BOARD_WIDTH][BOARD_HEIGHT];
@@ -111,12 +106,10 @@ public class Chessboard extends Component
 
     public void start()
     {
-        //System.out.println(getName()+" Start");
     }
 
     public void update()
     {
-        //System.out.println(getName()+" Update");
-        //System.out.println("This is Chessboard's Update");
+
     }
 }
