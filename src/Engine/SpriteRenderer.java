@@ -9,7 +9,9 @@ public class SpriteRenderer extends RendererComponent
     private Image sprite;
     private double width=100;
     private double height=100;
-    private int pivotX = 0, pivotY = 0;
+    private float pivotX = 0, pivotY = 0;
+    private float scaleX = 1;
+    private float scaleY = 1;
 
     /**
      * 指定sprite宽高的创建
@@ -17,7 +19,7 @@ public class SpriteRenderer extends RendererComponent
      * @param width 宽
      * @param height 高
      */
-    public SpriteRenderer(Image sprite, int width , int height )
+    public SpriteRenderer(Image sprite, float width , float height )
     {
         this.sprite = sprite;
         this.width = width;
@@ -32,6 +34,7 @@ public class SpriteRenderer extends RendererComponent
     {
         this.sprite = sprite;
         width = sprite.getWidth();
+        height = sprite.getHeight();
     }
 
     public SpriteRenderer()
@@ -51,6 +54,17 @@ public class SpriteRenderer extends RendererComponent
     }
 
     /**
+     * 缩放
+     * @param scaleX
+     * @param scaleY
+     */
+    public void Scale(float scaleX, float scaleY)
+    {
+        this.scaleX = scaleX;
+        this.scaleY = scaleY;
+    }
+
+    /**
      * 渲染图标，若图标确实，则显示为紫色
      *
      * @param gc GraphicsContext画笔
@@ -58,14 +72,13 @@ public class SpriteRenderer extends RendererComponent
     public void render(GraphicsContext gc)
     {
         Transform t = getGameObject().getComponent(Transform.class);
-        System.out.printf("rendering on t = (%f,%f)\n",t.getX(),t.getY());
         if (sprite == null)
         {
             gc.setFill(Color.color(1, 0, 1));
-            gc.fillRect(t.getX()+pivotX, t.getY()+pivotY, width, height);
+            gc.fillRect(t.getX()+pivotX, t.getY()+pivotY, width*scaleX, height*scaleY);
         } else
         {
-            gc.drawImage(sprite, t.getX()+pivotX, t.getY()+pivotY, width, height);
+            gc.drawImage(sprite, t.getX()+pivotX, t.getY()+pivotY, width*scaleX, height*scaleY);
         }
     }
 

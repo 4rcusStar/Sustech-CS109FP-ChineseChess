@@ -6,7 +6,9 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -18,12 +20,13 @@ public class EngineRenderer
     private static EngineRenderer instance;
     private Canvas canvas;//渲染所用的canvas
     private GraphicsContext gc;//canvas所持有的GraphicsContext(目前为2d)
-    private List<RendererComponent> rendererComponents = new ArrayList<>();
+    private Set<RendererComponent> rendererComponents = new LinkedHashSet<>();
     private EngineRenderer(Canvas canvas)
     {
         this.canvas= canvas;
         this.gc = canvas.getGraphicsContext2D();
     }
+
 
     /**
      * 获取rendererEngine的单例
@@ -40,13 +43,51 @@ public class EngineRenderer
     }
 
     /**
-     * 将要渲染的组件加入引擎中
+     * 在Canvas已被设置的情况下，获取单例
+     * @return RendererEngine.instance
+     */
+    public static EngineRenderer getInstance()
+    {
+        if(instance == null)
+            throw new IllegalStateException("EngineRenderer not initialized. Call getInstance(canvas) first.");
+        return instance;
+    }
+
+    public void registerGameWorld(GameWorld gameWorld)
+    {
+        GameObject root = gameWorld.getRoot();
+        for(Component renderer:root.getAllComponents())
+        {
+            if(renderer instanceof RendererComponent)
+            {
+                registerRenderer((RendererComponent)renderer);
+            }
+        }
+        for(GameObject rootChild:root.getChildren())
+        {
+            registerRecur(rootChild);
+        }
+    }
+    private void registerRecur(GameObject gameObject)
+    {
+        for(Component renderer:gameObject.getAllComponents())
+        {
+            if(renderer instanceof RendererComponent)
+                registerRenderer((RendererComponent)renderer);
+        }
+        for(GameObject child:gameObject.getChildren())
+        {
+            registerRecur(child);
+        }
+    }
+    /**
+     * 单独地将要渲染的组件加入引擎中
      * @param renderer 要渲染的组件
      */
     public void registerRenderer(RendererComponent renderer)
     {
-        if(!rendererComponents.contains(renderer))
-            rendererComponents.add(renderer);
+        System.out.println("Registering renderer "+renderer.getClass().getSimpleName());
+        rendererComponents.add(renderer);
     }
 
     /**启动渲染循环

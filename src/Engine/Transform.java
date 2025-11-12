@@ -18,7 +18,6 @@ public class Transform extends Component
         this.x = x;
         this.y = y;
     }
-
     /**
      *
      * @return x坐标
@@ -27,7 +26,6 @@ public class Transform extends Component
     {
         return x;
     }
-
     /**
      *
      * @return y坐标
@@ -36,7 +34,6 @@ public class Transform extends Component
     {
         return y;
     }
-
     /**
      * 直接设置Transform坐标
      * @param x 目标X

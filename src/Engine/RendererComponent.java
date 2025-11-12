@@ -8,4 +8,5 @@ public abstract class RendererComponent extends Component
      * @param gc GraphicsContext画笔
      */
     public abstract void render(GraphicsContext gc);
+
 }

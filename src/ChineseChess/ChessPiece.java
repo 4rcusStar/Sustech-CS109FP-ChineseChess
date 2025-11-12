@@ -19,6 +19,7 @@ public class ChessPiece extends GameObject
         this.side = side;
         //添加移动逻辑组件
         addComponent(new PieceMovementManager());
-
+        addComponent(new SpriteRenderer());
     }
+
 }
