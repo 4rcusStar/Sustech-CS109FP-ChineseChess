@@ -17,7 +17,8 @@ public interface GameBehavior
     default void update(){};
 
     /*
-     * 被摧毁时调用*/
+     * 被摧毁时调用
+     * */
 
     default void onDestroy()
     {
