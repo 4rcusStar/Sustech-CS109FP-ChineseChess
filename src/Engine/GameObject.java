@@ -24,6 +24,19 @@ public class GameObject
     }
 
     /**
+     * 在x,y处创建GameObject
+     * @param name GameObject's name
+     * @param x x
+     * @param y y
+     */
+    public GameObject(String name, int x,int y)
+    {
+        this.name = name;
+        Transform transform= new Transform(x,y);
+        this.addComponent(transform);
+    }
+
+    /**
      * 获取GameObject的name
      * @return GameObject.name
      */

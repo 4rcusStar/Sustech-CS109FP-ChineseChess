@@ -1,6 +1,7 @@
 package ChineseChess;
 
 import Engine.GameObject;
+import Engine.SpriteRenderer;
 import Engine.Transform;
 
 public class ChessPiece extends GameObject
@@ -18,5 +19,6 @@ public class ChessPiece extends GameObject
         this.side = side;
         //添加移动逻辑组件
         addComponent(new PieceMovementManager());
+
     }
 }

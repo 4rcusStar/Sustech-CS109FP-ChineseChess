@@ -2,12 +2,12 @@ package Engine;
 
 import java.util.List;
 
-public class Scene
+public class GameWorld
 {
     //场景入口节点
     private GameObject root;
 
-    public Scene()
+    public GameWorld()
     {
         root = new GameObject("SceneRoot");
     }

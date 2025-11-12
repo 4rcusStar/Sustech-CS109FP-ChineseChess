@@ -4,10 +4,11 @@ import Engine.Transform;
 
 public class PieceMovementManager extends Component
 {
+    static float frame = 0;
     @Override
     public void update()
     {
         Transform t = getGameObject().getComponent(Transform.class);
-        System.out.println(t.getX() + " " + t.getY());
+        t.setPosition(frame+=0.1f,100);
     }
 }

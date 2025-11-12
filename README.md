@@ -178,7 +178,7 @@ GameObject bullet = new GameObject("Bullet");
 player.addChild(bullet);
 
 // 在场景中查找对象
-GameObject found = scene.find("Enemy");
+GameObject found = gameWorld.find("Enemy");
 if (found != null) {
     System.out.println("找到敌人对象");
 }
@@ -223,14 +223,14 @@ public class SimpleMover extends Component {
 public class SimpleGame {
     public static void main(String[] args) {
         GameEngine engine = GameEngine.getInstance();
-        Scene scene = new Scene();
+        Scene gameWorld = new Scene();
         
         // 创建移动对象
         GameObject movingObj = new GameObject("MovingObject");
         movingObj.addComponent(new SimpleMover());
-        scene.getRoot().addChild(movingObj);
+        gameWorld.getRoot().addChild(movingObj);
         
-        engine.registerGameObject(scene.getRoot());
+        engine.registerGameObject(gameWorld.getRoot());
         engine.runEngine();
     }
 }

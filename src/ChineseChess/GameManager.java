@@ -22,7 +22,7 @@ public class GameManager
     }//todo:存档系统完善
 
     // 当前活动场景
-    private Scene currentScene;
+    private GameWorld currentGameWorld;
 
     // 全局逻辑系统，UI系统
     private UIManager uiManager;
@@ -36,26 +36,26 @@ public class GameManager
         this.uiManager = new UIManager();
         this.logicManager = new LogicManager();
 
-        loadScene(new Scene()); // 默认场景
+        loadScene(new GameWorld()); // 默认场景
     }
 
     /**
      * 加载场景
-     * @param scene 要加载的场景
+     * @param gameWorld 要加载的场景
      */
-    public void loadScene(Scene scene)
+    public void loadScene(GameWorld gameWorld)
     {
-        this.currentScene = scene;
-        GameEngine.getInstance().registerGameObject(scene.getRoot());
+        this.currentGameWorld = gameWorld;
+        GameEngine.getInstance().registerGameObject(gameWorld.getRoot());
     }
 
     /**
      *
      * @return 当前场景
      */
-    public Scene getCurrentScene()
+    public GameWorld getCurrentScene()
     {
-        return currentScene;
+        return currentGameWorld;
     }
 
     /**
