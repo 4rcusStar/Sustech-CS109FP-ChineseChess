@@ -80,6 +80,8 @@ public class GameEngine
                         break;
                     }
                 }
+
+
                 //更新上帧时间
                 lastUpdateTime = System.currentTimeMillis();
             }
