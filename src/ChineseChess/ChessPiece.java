@@ -1,6 +1,7 @@
 package ChineseChess;
 
 import Engine.GameObject;
+import Engine.PointerDetector;
 import Engine.SpriteRenderer;
 import Engine.Transform;
 
@@ -20,6 +21,7 @@ public class ChessPiece extends GameObject
         //添加移动逻辑组件
         addComponent(new PieceMovementManager());
         addComponent(new SpriteRenderer());
+        addComponent(new PointerDetector(50,50,1));
     }
 
 }

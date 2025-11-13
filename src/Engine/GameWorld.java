@@ -7,9 +7,10 @@ public class GameWorld
     //场景入口节点
     private GameObject root;
 
-    public GameWorld()
+    public GameWorld(GameWorldConstructor gameWorldConstructor)
     {
         root = new GameObject("SceneRoot");
+        gameWorldConstructor.construct(root);
     }
 
     public GameObject getRoot()

@@ -115,7 +115,8 @@ public class EngineRenderer
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         for(RendererComponent renderer:rendererComponents)
         {
-            renderer.render(gc);
+            if(renderer.isEnabled())
+                renderer.render(gc);
         }
     }
 }
