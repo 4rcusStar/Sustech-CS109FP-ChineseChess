@@ -67,16 +67,6 @@ public class GameObject
 
     public void addChild(GameObject child)
     {
-        /*//如果child为空或者children中已经有child则不执行代码
-        if(child==null||children.contains(child))
-            return;
-        //如果child已经有了一个parent，则移除原parent，添加本对象为parent
-        if(child.parent!=null)
-        {
-            child.parent.children.remove(child);
-        }
-        children.add(child);
-        child.parent=this;*/
         pendingChildren.add(child);
     }
 

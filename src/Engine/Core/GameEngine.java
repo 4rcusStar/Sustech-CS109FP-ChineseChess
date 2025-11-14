@@ -1,7 +1,5 @@
 package Engine.Core;
-
 import Engine.Input;
-
 import java.util.ArrayList;
 import java.util.List;
 

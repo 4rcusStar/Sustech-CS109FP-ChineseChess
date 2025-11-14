@@ -58,18 +58,6 @@ public class RenderEngine
         GameObject root = gameWorld.getRoot();
         registerRenderer(root);
     }
-    /*private void registerRecur(GameObject gameObject)
-    {
-        for(Component renderer:gameObject.getAllComponents())
-        {
-            if(renderer instanceof RendererComponent)
-                registerRenderer((RendererComponent)renderer);
-        }
-        for(GameObject child:gameObject.getChildren())
-        {
-            registerRecur(child);
-        }
-    }*/
     /**
      * 单独地将要渲染的组件加入引擎中
      * @param rendererObject 要渲染的Object
@@ -98,18 +86,6 @@ public class RenderEngine
     /**
      * 每次绘制的核心逻辑
      */
-    /*private void render()
-    {
-        gc.setFill(Color.BEIGE);
-        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        for(RendererComponent renderer:rendererComponents)
-        {
-            if(renderer.isEnabled())
-                renderer.render(gc);
-        }
-    }
-    弃用的版本：维护组件表
-    */
     private void render()
     {
         gc.setFill(Color.BEIGE);
