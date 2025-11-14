@@ -69,6 +69,16 @@ public class SpriteRenderer extends RendererComponent
         this.scaleY = scaleY;
     }
 
+    public double getWidth()
+    {
+        return width;
+    }
+
+    public double getHeight()
+    {
+        return height;
+    }
+
     public void setSize(float width, float height)
     {
         this.width = width;

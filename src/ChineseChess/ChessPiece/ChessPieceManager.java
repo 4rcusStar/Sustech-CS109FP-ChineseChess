@@ -11,20 +11,21 @@ public class ChessPieceManager extends Component
     Transform transform;
     SpriteRenderer spriteRenderer;
     PointerDetector pointerDetector;
-    private int coordX =0;
-    private int coordY =4;
+    private int coordX =4;
+    private int coordY =0;
 
     public void onAwake()
     {
         transform = getGameObject().getComponent(Transform.class);
         spriteRenderer = getGameObject().getComponent(SpriteRenderer.class);
         pointerDetector = getGameObject().getComponent(PointerDetector.class);
+        spriteRenderer.setSize(80,80);
     }
 
     public void onStart()
     {
         System.out.println("ChessPieceManager start");
-        float[] tPos = ChessBoardManager.coordMapToTransformPos(coordX,coordY);
+        float[] tPos = ChessBoardManager.coordToTransformPos(coordX,coordY);
         transform.setPosition(tPos[0],tPos[1]);
     }
 

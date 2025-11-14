@@ -1,10 +1,7 @@
 package Engine.Components;
-
 import Engine.Input;
-
 import java.util.HashSet;
 import java.util.Set;
-
 public class PointerDetector extends Component
 {
     Transform t;

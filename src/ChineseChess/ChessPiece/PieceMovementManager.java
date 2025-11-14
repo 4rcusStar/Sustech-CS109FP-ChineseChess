@@ -29,13 +29,13 @@ public class PieceMovementManager extends Component
 
     /**
      * 从当前位置移动到ij
-     * @param x
-     * @param y
-     * @param velocity
+     * @param x 棋盘坐标x
+     * @param y 棋盘坐标y
+     * @param velocity 速度
      */
     public void moveTo(int x,int y,float velocity)
     {
-        float[] tPos = ChessBoardManager.coordMapToTransformPos(x,y);
+        float[] tPos = ChessBoardManager.coordToTransformPos(x,y);
         transform.moveTo(tPos[0],tPos[1],velocity);
     }
 
@@ -46,7 +46,7 @@ public class PieceMovementManager extends Component
 
     public void setTo(int x, int y)
     {
-        float[] tPos = ChessBoardManager.coordMapToTransformPos(x,y);
+        float[] tPos = ChessBoardManager.coordToTransformPos(x,y);
         transform.moveTo(tPos[0],tPos[1],1000);
     }
 
@@ -58,7 +58,7 @@ public class PieceMovementManager extends Component
         {
             if(Input.isMouseClicked())
             {
-                moveTo(3,4);
+                moveTo(4,5);
             }
         }
     }
