@@ -74,6 +74,7 @@ public class GameEngine
                     obj.update();
                 }
 
+                Input.resetMouse();
                 //帧率控制
                 long elapsedTime = System.currentTimeMillis() - currentTime;
                 if (elapsedTime < timePerFrame)

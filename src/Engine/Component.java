@@ -26,6 +26,17 @@ public abstract class Component implements GameBehavior
     @Override
     public void start()
     {
+        if (isStarted)
+        {
+            return;
+        }
+
+        isStarted = true;
+        onStart();
+    }
+    public void onStart()
+    {
+
     }
 
     @Override
@@ -36,6 +47,18 @@ public abstract class Component implements GameBehavior
     @Override
     public void awake()
     {
+        if (isAwaken)
+        {
+            return;
+        }
+
+        isAwaken = true;
+        onAwake();
+    }
+
+    public void onAwake()
+    {
+
     }
     public boolean isEnabled()
     {

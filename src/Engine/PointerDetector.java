@@ -46,15 +46,15 @@ public class PointerDetector extends Component
         return isPointed;
     }
 
-    public void awake()
+    public void onAwake()
     {
         t = getGameObject().getComponent(Transform.class);
+        System.out.println(getGameObject()+"'s PointerIsAwaken");
     }
 
     static int readyComponents = 0;
     public void update()
     {
-
         //检测被鼠标指中的所有物体
         float leftEdge = t.getX();
         float rightEdge = t.getX()+detectWidth;

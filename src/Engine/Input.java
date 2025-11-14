@@ -55,6 +55,11 @@ public class Input
         return isMouseReleased;
     }
 
+     static void resetMouse()
+    {
+        isMouseClicked = false;
+    }
+
     /**
      * 获取鼠标的相对窗口坐标X
      * @return 鼠标的相对窗口坐标X

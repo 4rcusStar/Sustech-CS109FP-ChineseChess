@@ -196,8 +196,6 @@ public class GameObject
     //----------GameObject游戏循环管理------------
     public void awake()
     {
-        if(!isEnabled||isAwaken)
-            return;
         for(Component component : components)
         {
             component.awake();
@@ -208,12 +206,9 @@ public class GameObject
         {
             child.awake();
         }
-        isAwaken=true;
     }
     public void start()
     {
-        if(!isEnabled||isStarted)
-            return;
         for(Component component : components)
         {
             component.start();

@@ -9,14 +9,15 @@ public class PieceMovementManager extends Component
     Transform transform;
     PointerDetector pointerDetector;
 
-    public void awake()
+    @Override
+    public void onAwake()
     {
         spriteRenderer = getGameObject().getComponent(SpriteRenderer.class);
         transform = getGameObject().getComponent(Transform.class);
         pointerDetector = getGameObject().getComponent(PointerDetector.class);
     }
-
-    public void start()
+    @Override
+    public void onStart()
     {
 
     }
@@ -26,6 +27,7 @@ public class PieceMovementManager extends Component
     {
         if(pointerDetector.isPointed())
         {
+            System.out.println(getGameObject().getName()+"isPointed");
             if(Input.isMouseClicked())
             {
                 System.out.println(getGameObject().getChildren().size());
