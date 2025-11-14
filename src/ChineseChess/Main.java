@@ -1,6 +1,6 @@
 package ChineseChess;
 
-import Engine.*;
+import Engine.GameBuilding.GameStarter;
 
 
 public class Main

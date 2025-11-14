@@ -1,8 +1,8 @@
-package ChineseChess;
+package ChineseChess.ChessPiece;
 
-import Engine.GameObject;
-import Engine.PointerDetector;
-import Engine.SpriteRenderer;
+import Engine.Core.GameObject;
+import Engine.Components.PointerDetector;
+import Engine.Components.SpriteRenderer;
 
 public class ChessPiece extends GameObject
 {

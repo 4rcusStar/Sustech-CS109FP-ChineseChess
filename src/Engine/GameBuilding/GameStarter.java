@@ -1,5 +1,9 @@
-package Engine;
+package Engine.GameBuilding;
 
+import Engine.Core.GameEngine;
+import Engine.Core.GameObject;
+import Engine.Core.RenderEngine;
+import Engine.Input;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;

@@ -1,4 +1,4 @@
-package Engine;
+package Engine.Components;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;

@@ -1,5 +1,8 @@
-package Engine;
+package Engine.Core;
 
+import Engine.Components.Component;
+import Engine.Components.RendererComponent;
+import Engine.Components.Transform;
 import javafx.scene.canvas.GraphicsContext;
 
 import java.util.ArrayList;
@@ -90,7 +93,7 @@ public class GameObject
     /**
      * 在每帧的开始应用父子设置关系
      */
-     void applyPendingRelation()
+     public void applyPendingRelation()
     {
         for(GameObject child:pendingChildren)
         {
@@ -254,7 +257,7 @@ public class GameObject
      * 渲染引擎调用渲染
      * @param gc
      */
-    void render(GraphicsContext gc)
+    public void render(GraphicsContext gc)
     {
         for (Component component : components)
         {

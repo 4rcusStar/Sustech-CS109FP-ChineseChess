@@ -1,9 +1,10 @@
-package ChineseChess;
+package ChineseChess.ChessPiece;
 
-import Engine.Component;
-import Engine.PointerDetector;
-import Engine.SpriteRenderer;
-import Engine.Transform;
+import ChineseChess.ChessBoard.ChessBoardManager;
+import Engine.Components.Component;
+import Engine.Components.PointerDetector;
+import Engine.Components.SpriteRenderer;
+import Engine.Components.Transform;
 
 public class ChessPieceManager extends Component
 {

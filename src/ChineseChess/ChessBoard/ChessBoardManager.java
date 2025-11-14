@@ -1,6 +1,9 @@
-package ChineseChess;
+package ChineseChess.ChessBoard;
 
-import Engine.*;
+import Engine.Components.Component;
+import Engine.Components.PointerDetector;
+import Engine.Components.SpriteRenderer;
+import Engine.Components.Transform;
 import javafx.scene.image.Image;
 
 public class ChessBoardManager extends Component

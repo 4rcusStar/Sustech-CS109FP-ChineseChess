@@ -1,4 +1,6 @@
-package Engine;
+package Engine.Components;
+
+import Engine.Input;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -1,4 +1,7 @@
-package Engine;
+package Engine.Components;
+
+import Engine.Core.GameEngine;
+
 //TODO:完善Transform的层级功能和线性变换
 public class Transform extends Component
 {

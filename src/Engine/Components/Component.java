@@ -1,4 +1,7 @@
-package Engine;
+package Engine.Components;
+
+import Engine.Core.GameBehavior;
+import Engine.Core.GameObject;
 
 public abstract class Component implements GameBehavior
 {
@@ -64,7 +67,7 @@ public abstract class Component implements GameBehavior
     {
         return isEnabled;
     }
-    protected boolean isAwaken(){return isAwaken;}
+    public boolean isAwaken(){return isAwaken;}
     public void setEnabled(boolean enabled)
     {
         isEnabled = enabled;
@@ -74,6 +77,6 @@ public abstract class Component implements GameBehavior
     {
         isAwaken = true;
     }
-    protected boolean isStarted() {return isStarted;}
-    protected void markStarted(){isStarted = true;}
+    public boolean isStarted() {return isStarted;}
+    public void markStarted(){isStarted = true;}
 }

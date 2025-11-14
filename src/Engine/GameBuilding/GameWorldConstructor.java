@@ -1,4 +1,6 @@
-package Engine;
+package Engine.GameBuilding;
+
+import Engine.Core.GameObject;
 
 public abstract class GameWorldConstructor
 {

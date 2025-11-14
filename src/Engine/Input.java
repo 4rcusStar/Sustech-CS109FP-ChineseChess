@@ -55,7 +55,7 @@ public class Input
         return isMouseReleased;
     }
 
-     static void resetMouse()
+    public static void resetMouseClicked()
     {
         isMouseClicked = false;
     }

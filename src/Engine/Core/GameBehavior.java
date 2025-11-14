@@ -1,4 +1,4 @@
-package Engine;
+package Engine.Core;
 
 public interface GameBehavior
 {

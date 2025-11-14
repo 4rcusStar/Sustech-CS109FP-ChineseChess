@@ -1,7 +1,9 @@
 package ChineseChess;
 
-import Engine.GameObject;
-import Engine.GameWorldConstructor;
+import ChineseChess.ChessBoard.ChessBoard;
+import ChineseChess.ChessPiece.ChessPiece;
+import Engine.Core.GameObject;
+import Engine.GameBuilding.GameWorldConstructor;
 
 public class ChessWorldConstructor extends GameWorldConstructor
 {

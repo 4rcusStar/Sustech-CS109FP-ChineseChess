@@ -1,4 +1,6 @@
-package Engine;
+package Engine.GameBuilding;
+
+import Engine.Core.GameObject;
 
 import java.util.List;
 

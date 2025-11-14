@@ -1,4 +1,6 @@
-package Engine;
+package Engine.Core;
+
+import Engine.Input;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +76,7 @@ public class GameEngine
                     obj.update();
                 }
 
-                Input.resetMouse();
+                Input.resetMouseClicked();
                 //帧率控制
                 long elapsedTime = System.currentTimeMillis() - currentTime;
                 if (elapsedTime < timePerFrame)

@@ -1,12 +1,12 @@
-package Engine;
+package Engine.Core;
 
+import Engine.GameBuilding.GameWorld;
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 
