@@ -26,11 +26,14 @@ public class PieceMovementManager extends Component
     {
         if(pointerDetector.isPointed())
         {
-            if(Input.isMousePressed())
+            if(Input.isMouseClicked())
             {
+                System.out.println(getGameObject().getChildren().size());
                 transform.moveTo(30,30,100);
+                ChessPiece piece = new ChessPiece("Son","Son",transform.getX(),transform.getY());
+                getGameObject().addChild(piece);
+                System.out.println(getGameObject().getChildren().size());
             }
-
         }
     }
 }

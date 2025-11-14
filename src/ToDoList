@@ -1,3 +1,3 @@
-11/14 目标：1.重构RenderEngine注册逻辑，使得其和GameEngine一样从一个或少数几个GameObject开始递归地查找renderer并渲染；
-           2.重写addChild,setParent方法，使其在游戏中动态创建时先进入注册表，再在下一帧开始注册，如此动态创建GameObject时只需要设置该Object的父Object即可自动完成注册
+11/14 目标：1.重构RenderEngine注册逻辑，使得其和GameEngine一样从一个或少数几个GameObject开始递归地查找renderer并渲染；✔
+           2.重写addChild,setParent方法，使其在游戏中动态创建时先进入注册表，再在下一帧开始注册，如此动态创建GameObject时只需要设置该Object的父Object即可自动完成注册✔
            3.完成GameObject.destroy方法，使其递归地调用子GameObject的onDestroy,最后设置父节点为空以完成与场景脱离

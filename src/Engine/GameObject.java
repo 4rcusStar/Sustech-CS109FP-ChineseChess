@@ -13,6 +13,9 @@ public class GameObject
     private GameObject parent;//该GameObject的父GameObject
     private List<GameObject> children = new ArrayList<>();//该GameObject的子GameObject
 
+    private GameObject pendingParent;//待加入/变更的父OBJ
+    private List<GameObject> pendingChildren = new ArrayList<>();//待加入的子OBJ
+
     private boolean isAwaken=false;//是否已经调用过awake()
     private boolean isStarted=false;//是否已经调用过start()
     private boolean isEnabled=true;
@@ -59,7 +62,7 @@ public class GameObject
 
     public void addChild(GameObject child)
     {
-        //如果child为空或者children中已经有child则不执行代码
+        /*//如果child为空或者children中已经有child则不执行代码
         if(child==null||children.contains(child))
             return;
         //如果child已经有了一个parent，则移除原parent，添加本对象为parent
@@ -68,7 +71,51 @@ public class GameObject
             child.parent.children.remove(child);
         }
         children.add(child);
-        child.parent=this;
+        child.parent=this;*/
+        pendingChildren.add(child);
+    }
+
+    public void setParent(GameObject parent)
+    {
+        pendingParent = parent;
+    }
+
+    /**
+     * 在每帧的开始应用父子设置关系
+     */
+    void applyPendingRelation()
+    {
+        for(GameObject child:pendingChildren)
+        {
+            //如果child为空或者children中已经有child则不执行代码
+            if(child==null||children.contains(child))
+                return;
+            //如果child已经有了一个parent，则移除原parent，添加本对象为parent
+            if(child.parent!=null)
+            {
+                child.parent.children.remove(child);
+            }
+            children.add(child);
+            child.parent=this;
+        }
+        pendingChildren.clear();
+        if(pendingParent!=null)
+        {
+            if(this.parent==null)
+                this.parent=pendingParent;
+            if(this.parent==pendingParent)
+                return;
+            if (this.parent.children.contains(this))
+                return;
+            this.parent.children.remove(this);
+            parent.children.add(this);
+            this.parent = pendingParent;
+        }
+        pendingParent=null;
+        for(GameObject child:children)
+        {
+            child.applyPendingRelation();
+        }
     }
 
     /**
@@ -84,12 +131,6 @@ public class GameObject
                 return child;
         }
         return null;
-    }
-    public void setParent(GameObject parent)
-    {
-        if(parent==null||this.parent==parent)
-            return;
-        parent.addChild(this);
     }
 
 
@@ -201,7 +242,11 @@ public class GameObject
         }
     }
 
-    public void render(GraphicsContext gc)
+    /**
+     * 渲染引擎调用渲染
+     * @param gc
+     */
+    void render(GraphicsContext gc)
     {
         for (Component component : components)
         {
@@ -215,4 +260,5 @@ public class GameObject
             child.render(gc);
         }
     }
+
 }

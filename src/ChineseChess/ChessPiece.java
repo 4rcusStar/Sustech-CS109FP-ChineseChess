@@ -10,7 +10,7 @@ public class ChessPiece extends GameObject
     private String type;
     private String side;
     Transform transform;
-    public ChessPiece(String type, String side,int x,int y)
+    public ChessPiece(String type, String side,float x,float y)
     {
         super(side+"_"+type);
         //设置位置

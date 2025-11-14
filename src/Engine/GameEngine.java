@@ -57,15 +57,19 @@ public class GameEngine
                 lastUpdateTime = currentTime;
 
                 // ---- 游戏逻辑更新 ----
-                for (GameObject obj : gameObjects)
+                for(GameObject obj : gameObjects)//更新父子关系
+                {
+                    obj.applyPendingRelation();
+                }
+                for (GameObject obj : gameObjects)//调用未调用的awake()
                 {
                     obj.awake();
                 }
-                for (GameObject obj : gameObjects)
+                for (GameObject obj : gameObjects)//调用未调用的awake()
                 {
                     obj.start();
                 }
-                for (GameObject obj : gameObjects)
+                for (GameObject obj : gameObjects)//调用所有GameObj的update()
                 {
                     obj.update();
                 }

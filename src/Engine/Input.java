@@ -30,9 +30,12 @@ public class Input
 
     public static boolean isMouseClicked()
     {
-        boolean isClicked = isMouseClicked;
-        isMouseClicked = false;
-        return isClicked;
+        if (isMouseClicked)
+        {
+            isMouseClicked = false;
+            return true;
+        }
+        return false;
     }
     /**
      * 当鼠标左键按住时为true
