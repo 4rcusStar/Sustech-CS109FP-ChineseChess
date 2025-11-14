@@ -7,6 +7,7 @@ public class Input
     private static Canvas canvas;
     private static boolean isMousePressed;
     private static boolean isMouseReleased;
+    private static boolean isMouseClicked;
     private static double mouseX;
     private static double mouseY;
     /**
@@ -24,8 +25,15 @@ public class Input
                     mouseY = event.getY();
                 }
         );
+        canvas.setOnMouseClicked(event ->isMouseClicked =true);
     }
 
+    public static boolean isMouseClicked()
+    {
+        boolean isClicked = isMouseClicked;
+        isMouseClicked = false;
+        return isClicked;
+    }
     /**
      * 当鼠标左键按住时为true
      * @return 鼠标左键是否按住

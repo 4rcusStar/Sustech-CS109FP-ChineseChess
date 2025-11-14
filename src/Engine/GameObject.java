@@ -1,5 +1,7 @@
 package Engine;
 
+import javafx.scene.canvas.GraphicsContext;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -196,6 +198,21 @@ public class GameObject
         for(GameObject child : children)
         {
             child.update();
+        }
+    }
+
+    public void render(GraphicsContext gc)
+    {
+        for (Component component : components)
+        {
+            if(component.isEnabled()&&component instanceof RendererComponent)
+            {
+                ((RendererComponent) component).render(gc);
+            }
+        }
+        for(GameObject child : children)
+        {
+            child.render(gc);
         }
     }
 }

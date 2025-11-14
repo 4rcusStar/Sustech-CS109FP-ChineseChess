@@ -38,7 +38,7 @@ public class GameStarter extends Application
 
         //初始化渲染器
         Canvas canvas = new Canvas(_canvasWidth, _canvasHeight);
-        EngineRenderer renderEngine = EngineRenderer.getInstance(canvas);
+        RenderEngine renderEngine = RenderEngine.getInstance(canvas);
         Input.bindCanvas(canvas);
 
         renderEngine.startRenderLoop();
