@@ -7,8 +7,8 @@ import javafx.scene.paint.Color;
 public class SpriteRenderer extends RendererComponent
 {
     private Image sprite;
-    private double width=100;
-    private double height=100;
+    private double width=50;
+    private double height=50;
     private float pivotX = 0, pivotY = 0;
     private float scaleX = 1;
     private float scaleY = 1;
@@ -53,6 +53,11 @@ public class SpriteRenderer extends RendererComponent
         pivotY = y;
     }
 
+    public void setSprite(Image sprite)
+    {
+        this.sprite = sprite;
+    }
+
     /**
      * 缩放
      * @param scaleX
@@ -62,6 +67,12 @@ public class SpriteRenderer extends RendererComponent
     {
         this.scaleX = scaleX;
         this.scaleY = scaleY;
+    }
+
+    public void setSize(float width, float height)
+    {
+        this.width = width;
+        this.height = height;
     }
 
     /**

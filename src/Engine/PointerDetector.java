@@ -71,7 +71,7 @@ public class PointerDetector extends Component
             }
         }
         readyComponents++;
-        //System.out.printf("%s at Layer %d is in range:%s,is pointed:%s,currentPointed:%s\n)",getGameObject().getName(),layer,isInRange,isPointed,currentPointed);
+        //System.out.printf("%s at Layer %d is in range:%s,is pointed:%s,currentPointed:%s\n)",getGameObject().getName(),layer,isInRange,isPointed,currentPointed.getGameObject().getName());
         //当最后一个组件也处理完上逻辑后，执行一次resolvePointed
         if(readyComponents == allDetectors.size())
             resolvePointed();

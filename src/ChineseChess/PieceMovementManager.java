@@ -3,7 +3,7 @@ import Engine.*;
 
 public class PieceMovementManager extends Component
 {
-    float frame = 0;
+    ChessPieceManager chessPieceManager;
     SpriteRenderer spriteRenderer;
     Transform transform;
     PointerDetector pointerDetector;
@@ -14,32 +14,47 @@ public class PieceMovementManager extends Component
         spriteRenderer = getGameObject().getComponent(SpriteRenderer.class);
         transform = getGameObject().getComponent(Transform.class);
         pointerDetector = getGameObject().getComponent(PointerDetector.class);
+        chessPieceManager = getGameObject().getComponent(ChessPieceManager.class);
     }
     @Override
     public void onStart()
     {
 
     }
+
+    /**
+     * 从当前位置移动到ij
+     * @param x
+     * @param y
+     * @param velocity
+     */
+    public void moveTo(int x,int y,float velocity)
+    {
+        float[] tPos = ChessBoardManager.coordMapToTransformPos(x,y);
+        transform.moveTo(tPos[0],tPos[1],velocity);
+    }
+
+    public void moveTo(int x,int y)
+    {
+        moveTo(x,y,1000);
+    }
+
+    public void setTo(int x, int y)
+    {
+        float[] tPos = ChessBoardManager.coordMapToTransformPos(x,y);
+        transform.moveTo(tPos[0],tPos[1],1000);
+    }
+
     boolean moveStarted = false;
     @Override
     public void update()
     {
-
         if(pointerDetector.isPointed())
         {
-            System.out.println(getGameObject().getName()+"isPointed,parent:"+getGameObject().getParent().getName());
             if(Input.isMouseClicked())
             {
-                System.out.println(getGameObject().getChildren().size());
-                transform.moveTo(30,30,100);
-                moveStarted = true;
+                moveTo(3,4);
             }
-        }
-
-        if(moveStarted)
-        {
-            if(!transform.isMoving())
-                getGameObject().destroy();
         }
     }
 }

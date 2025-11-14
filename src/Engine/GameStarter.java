@@ -12,7 +12,6 @@ public class GameStarter extends Application
     private static float _canvasHeight;
     private static String _title;
     private static GameEngine engine = GameEngine.getInstance();
-
     private static GameWorldConstructor _gameWorldConstructor;
 
 
@@ -27,6 +26,10 @@ public class GameStarter extends Application
     public static void launchGame(String[] args)
     {
         Application.launch(args);
+    }
+
+    public static void setResizable(boolean resizable)
+    {
     }
 
     @Override
@@ -54,6 +57,7 @@ public class GameStarter extends Application
             GameEngine.getInstance().stopEngine();
         });
         stage.setTitle(_title);
+        stage.setResizable(false);
         stage.show();
     }
 
