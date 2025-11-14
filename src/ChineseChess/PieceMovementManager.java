@@ -1,6 +1,5 @@
 package ChineseChess;
 import Engine.*;
-import javafx.scene.shape.MoveTo;
 
 public class PieceMovementManager extends Component
 {
@@ -21,21 +20,26 @@ public class PieceMovementManager extends Component
     {
 
     }
-
+    boolean moveStarted = false;
     @Override
     public void update()
     {
+
         if(pointerDetector.isPointed())
         {
-            System.out.println(getGameObject().getName()+"isPointed");
+            System.out.println(getGameObject().getName()+"isPointed,parent:"+getGameObject().getParent().getName());
             if(Input.isMouseClicked())
             {
                 System.out.println(getGameObject().getChildren().size());
                 transform.moveTo(30,30,100);
-                ChessPiece piece = new ChessPiece("Son","Son",transform.getX(),transform.getY());
-                getGameObject().addChild(piece);
-                System.out.println(getGameObject().getChildren().size());
+                moveStarted = true;
             }
+        }
+
+        if(moveStarted)
+        {
+            if(!transform.isMoving())
+                getGameObject().destroy();
         }
     }
 }

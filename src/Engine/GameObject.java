@@ -3,6 +3,7 @@ package Engine;
 import javafx.scene.canvas.GraphicsContext;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class GameObject
@@ -19,6 +20,7 @@ public class GameObject
     private boolean isAwaken=false;//是否已经调用过awake()
     private boolean isStarted=false;//是否已经调用过start()
     private boolean isEnabled=true;
+    private boolean pendingDestroy=false;
 
     public GameObject(String name)
     {
@@ -80,10 +82,15 @@ public class GameObject
         pendingParent = parent;
     }
 
+    public void destroy()
+    {
+        pendingDestroy=true;
+    }
+
     /**
      * 在每帧的开始应用父子设置关系
      */
-    void applyPendingRelation()
+     void applyPendingRelation()
     {
         for(GameObject child:pendingChildren)
         {
@@ -112,7 +119,13 @@ public class GameObject
             this.parent = pendingParent;
         }
         pendingParent=null;
-        for(GameObject child:children)
+        if(pendingDestroy)
+        {
+            parent.children.remove(this);
+            parent=null;
+            return;
+        }
+        for(GameObject child:new LinkedList<>(children))
         {
             child.applyPendingRelation();
         }
