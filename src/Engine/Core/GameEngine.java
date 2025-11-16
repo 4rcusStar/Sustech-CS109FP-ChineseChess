@@ -11,7 +11,8 @@ public class GameEngine
     private long lastUpdateTime;
     private final int targetFPS = 60;
     private final int timePerFrame = 1000 / targetFPS;
-    private long deltaTime;
+    private static long deltaTime;
+    private static long totalFrame=0;
 
     private GameEngine() {}
 
@@ -32,9 +33,14 @@ public class GameEngine
     /**
      * @return 两帧之间的毫秒间隔
      */
-    public long getDeltaTime()
+    public static long getDeltaTime()
     {
         return deltaTime;
+    }
+
+    public static long getTotalFrame()
+    {
+        return totalFrame;
     }
 
     public void runEngine()
@@ -89,6 +95,7 @@ public class GameEngine
                         break;
                     }
                 }
+                ++totalFrame;
             }
         }).start();
     }

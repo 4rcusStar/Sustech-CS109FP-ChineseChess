@@ -47,19 +47,13 @@ public class PieceMovementManager extends Component
     public void setTo(int x, int y)
     {
         float[] tPos = ChessBoardManager.coordToTransformPos(x,y);
-        transform.moveTo(tPos[0],tPos[1],1000);
+        transform.setPosition(tPos[0],tPos[1]);
     }
 
     boolean moveStarted = false;
     @Override
     public void update()
     {
-        if(pointerDetector.isPointed())
-        {
-            if(Input.isMouseClicked())
-            {
-                moveTo(4,5);
-            }
-        }
+
     }
 }

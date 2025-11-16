@@ -12,5 +12,6 @@ public class ChessBoard extends GameObject
         addComponent(new ChessBoardManager());
         addComponent(new SpriteRenderer());
         addComponent(new PointerDetector(800,800,0));
+        addComponent(new Selector());
     }
 }

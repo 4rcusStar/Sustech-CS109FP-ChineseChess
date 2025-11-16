@@ -1,5 +1,6 @@
 package ChineseChess.ChessBoard;
 
+import ChineseChess.ChessPiece.ChessPiece;
 import Engine.Components.Component;
 import Engine.Components.PointerDetector;
 import Engine.Components.SpriteRenderer;
@@ -15,6 +16,8 @@ public class ChessBoardManager extends Component
     Image sprite = new Image("file:/C:/Users/ASUS/IdeaProjects/FP-ChineseChess/src/ChessBoard.png");
     private int pointingX;
     private int pointingY;
+    private ChessPiece[][] chessPieces = new ChessPiece[9][10];
+    private ChessPiece selectedChessPiece;
 
     @Override
     public void onAwake()
@@ -38,13 +41,19 @@ public class ChessBoardManager extends Component
      */
     public static float[] coordToTransformPos(int coordX, int coordY)
     {
-        float[] coordMap = new float[2];
-        coordMap[0] = 82 + coordX * 80.6f - 40;
-        coordMap[1] = 52 + coordY * 78.f - 40;
-        return coordMap;
+        // 基准点
+        final float baseX = 81.6f;
+        final float baseY = 52.0f;
+        // 步长
+        final float stepX = 79.9f;
+        final float stepY = 77.8f;
+
+        float x = baseX + coordX * stepX;
+        float y = baseY + coordY * stepY;
+        return new float[]{x-40, y-40};
     }
 
-    public static int[] TransformPosToCoord(float transX, float transY)
+    public static int[] transformPosToCoord(float transX, float transY)
     {
         int coordX;
         int coordY;
@@ -74,9 +83,8 @@ public class ChessBoardManager extends Component
     {
         float mouseX = (float) Input.getMouseX();
         float mouseY = (float) Input.getMouseY();
-        int coordX = TransformPosToCoord(mouseX, mouseY)[0];
-        int coordY = TransformPosToCoord(mouseX, mouseY)[1];
-        System.out.printf("Pointing(%d,%d)\n", coordX, coordY);
+        pointingX = transformPosToCoord(mouseX, mouseY)[0];
+        pointingY = transformPosToCoord(mouseX, mouseY)[1];
     }
 
 }
