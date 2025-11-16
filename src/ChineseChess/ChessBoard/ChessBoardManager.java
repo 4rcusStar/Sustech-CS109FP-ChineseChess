@@ -13,7 +13,7 @@ public class ChessBoardManager extends Component
     Transform transform;
     SpriteRenderer spriteRenderer;
     PointerDetector pointerDetector;
-    Image sprite = new Image("file:/C:/Users/ASUS/IdeaProjects/FP-ChineseChess/src/ChessBoard.png");
+    Image sprite = new Image("file:src/resources/images/ChessBoard.png");
     private int pointingX;
     private int pointingY;
     private ChessPiece[][] chessPieces = new ChessPiece[9][10];

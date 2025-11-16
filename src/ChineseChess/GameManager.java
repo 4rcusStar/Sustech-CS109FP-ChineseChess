@@ -4,8 +4,7 @@ package ChineseChess;
 import Engine.*;
 
 public class GameManager
-{
-    private static GameManager instance;
+{    private static GameManager instance;
     private GameManager() { }
 
     public static GameManager getInstance()
