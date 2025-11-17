@@ -1,6 +1,7 @@
 package ChineseChess.ChessBoard;
 
 import ChineseChess.ChessPiece.ChessPiece;
+import ChineseChess.ChessPiece.PieceMovementManager;
 import Engine.Components.Component;
 import Engine.Components.PointerDetector;
 import Engine.Components.SpriteRenderer;
@@ -64,12 +65,12 @@ public class ChessBoardManager extends Component
 
     public int getPointingX()
     {
-        return pointingX;
+        return pointingX<9?pointingX:8;
     }
 
     public int getPointingY()
     {
-        return pointingY;
+        return pointingY<10?pointingY:9;
     }
 
 
@@ -77,6 +78,17 @@ public class ChessBoardManager extends Component
     {
         updatePointingStatus();
         //System.out.printf("(%.0f,%.0f)\n",Input.getMouseY(),Input.getMouseX());
+        if(Input.isMouseClicked())
+        {
+            ChessPiece pointedPiece = getChessPieceAt(pointingX,pointingY);
+
+            if(pointedPiece == null&&selectedChessPiece != null)
+            {
+                selectedChessPiece.getComponent(PieceMovementManager.class).moveTo(pointingX,pointingY);
+            }
+
+            selectedChessPiece = pointedPiece;
+        }
     }
 
     private void updatePointingStatus()
@@ -85,6 +97,26 @@ public class ChessBoardManager extends Component
         float mouseY = (float) Input.getMouseY();
         pointingX = transformPosToCoord(mouseX, mouseY)[0];
         pointingY = transformPosToCoord(mouseX, mouseY)[1];
+    }
+
+    public ChessPiece getChessPieceAt(int x, int y)
+    {
+            return chessPieces[x][y];
+    }
+
+    public void setPieceAt(ChessPiece chessPiece, int x, int y)
+    {
+        chessPieces[x][y] = chessPiece;
+    }
+
+    public void setSelectedChessPiece(ChessPiece selectedChessPiece)
+    {
+        this.selectedChessPiece = selectedChessPiece;
+    }
+
+    public ChessPiece getSelectedChessPiece()
+    {
+        return selectedChessPiece;
     }
 
 }

@@ -12,6 +12,7 @@ public class PieceMovementManager extends Component
     SpriteRenderer spriteRenderer;
     Transform transform;
     PointerDetector pointerDetector;
+    ChessBoardManager chessBoardManager;
 
     @Override
     public void onAwake()
@@ -20,6 +21,7 @@ public class PieceMovementManager extends Component
         transform = getGameObject().getComponent(Transform.class);
         pointerDetector = getGameObject().getComponent(PointerDetector.class);
         chessPieceManager = getGameObject().getComponent(ChessPieceManager.class);
+        chessBoardManager = getGameObject().getParent().getComponent(ChessBoardManager.class);
     }
     @Override
     public void onStart()
@@ -36,7 +38,12 @@ public class PieceMovementManager extends Component
     public void moveTo(int x,int y,float velocity)
     {
         float[] tPos = ChessBoardManager.coordToTransformPos(x,y);
+        //通知棋盘和棋子更新数据,移动
+        chessBoardManager.setPieceAt(null,chessPieceManager.getCoordX(),chessPieceManager.getCoordY());
         transform.moveTo(tPos[0],tPos[1],velocity);
+        chessPieceManager.setCoord(x,y);
+        chessBoardManager.setPieceAt((ChessPiece) this.getGameObject(),x,y);
+
     }
 
     public void moveTo(int x,int y)
@@ -47,7 +54,11 @@ public class PieceMovementManager extends Component
     public void setTo(int x, int y)
     {
         float[] tPos = ChessBoardManager.coordToTransformPos(x,y);
+        //通知棋盘和棋子更新数据
+        chessBoardManager.setPieceAt(null,chessPieceManager.getCoordX(),chessPieceManager.getCoordY());
         transform.setPosition(tPos[0],tPos[1]);
+        chessPieceManager.setCoord(x,y);
+        chessBoardManager.setPieceAt((ChessPiece) this.getGameObject(),x,y);
     }
 
     boolean moveStarted = false;

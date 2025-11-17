@@ -1,79 +1,129 @@
 package ChineseChess.ChessBoard;
 
+import ChineseChess.ChessPiece.ChessPiece;
+import ChineseChess.ChessPiece.ChessPieceManager;
 import Engine.Components.RendererComponent;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 public class Selector extends RendererComponent
 {
-    private ChessBoardManager chessBoardManager;
-    private int currentX;
-    private int currentY;
-    private boolean isSelected=false;
+    private ChessBoardManager board;
 
+    private int hoverX;
+    private int hoverY;
+
+    private int selectedX = -1;
+    private int selectedY = -1;
+
+    private ChessPiece lastSelected;
+
+    @Override
     public void onAwake()
     {
-        chessBoardManager = getGameObject().getComponent(ChessBoardManager.class);
+        board = getGameObject().getComponent(ChessBoardManager.class);
     }
 
-    public void onStart()
-    {
-        isSelected = true;
-    }
-
-
+    @Override
     public void update()
     {
+        hoverX = board.getPointingX();
+        hoverY = board.getPointingY();
 
+        //当前被选中的棋子
+        ChessPiece curr = board.getSelectedChessPiece();
+
+        //如果选中状态变化，则刷新固定框位置
+        if (curr != lastSelected)
+        {
+            if (curr != null)
+            {
+                selectedX = curr.getComponent(ChessPieceManager.class).getCoordX();
+                selectedY = curr.getComponent(ChessPieceManager.class).getCoordY();
+            }
+            else
+            {
+                selectedX = -1;
+                selectedY = -1;
+            }
+        }
+
+        lastSelected = curr;
     }
+
     @Override
     public void render(GraphicsContext gc)
     {
-        drawSelector(gc,isSelected);
+        drawHoverBox(gc);      // 跟随鼠标
+        drawSelectedBox(gc);   // 固定呼吸框
     }
-    private void drawSelector(GraphicsContext gc,boolean isSelected)
+
+    private void drawHoverBox(GraphicsContext gc)
     {
-        // 获取当前选中的格子
-        currentX = chessBoardManager.getPointingX();
-        currentY = chessBoardManager.getPointingY();
-        float[] pos = ChessBoardManager.coordToTransformPos(currentX, currentY);
-        float cx = pos[0] + 40; // 棋子大小 80x80，取中心
-        float cy = pos[1] + 40;
-        float size = 80;          // 方框大小
-        float half = size / 2f;
-        float corner = 14f;       // 折角长度
-        float lineWidth = 5f;
-        // 画笔设置
+        float[] pos = ChessBoardManager.coordToTransformPos(hoverX, hoverY);
+
         gc.setStroke(Color.CORNFLOWERBLUE);
-        //如果进入选中状态,变为呼吸光
-        if(isSelected)
+        gc.setLineWidth(3);
+
+        drawCornerBox(gc, pos[0], pos[1], 80, 16);
+    }
+
+    private void drawSelectedBox(GraphicsContext gc)
+    {
+        if (selectedX < 0)
         {
-            double t = System.currentTimeMillis() / 400.0;
-            double k = (Math.sin(t) + 1) / 2.0;            // 映射到 0~1
-            Color c = new Color(
-                    0.2 + 0.6 * k,     // R
-                    0.4 + 0.4 * k,     // G
-                    1.0,  // B
-                    1.0
-            );
-            gc.setStroke(c);
+            return;
         }
-        gc.setLineWidth(lineWidth);
-        gc.setLineDashes(); // 取消虚线
-        // 左上角
+
+        float[] pos = ChessBoardManager.coordToTransformPos(selectedX, selectedY);
+
+        // 呼吸值
+        double t = System.currentTimeMillis() / 400.0;
+        double k = (Math.sin(t) + 1.0) / 2.0;
+
+        //渐变色
+        Color gradient = new Color(
+                0.3 + 0.5 * k,
+                0.5 + 0.5 * k,
+                1.0,
+                1.0
+        );
+
+        gc.setStroke(gradient);
+        gc.setLineWidth(5);
+
+        // 呼吸框稍微大一点，看起来更亮
+        drawCornerBox(gc, pos[0], pos[1], 80, 16);
+    }
+
+    /**
+     * 绘制方框
+     * @param gc gc
+     * @param x 锚点x
+     * @param y 锚点y
+     * @param size 方框大小
+     * @param corner 方框长度
+     */
+    private void drawCornerBox(GraphicsContext gc, float x, float y, float size, float corner)
+    {
+        float cx = x + size / 2f;
+        float cy = y + size / 2f;
+        float half = size / 2f;
+
+        // 左上
         gc.strokeLine(cx - half, cy - half, cx - half + corner, cy - half);
         gc.strokeLine(cx - half, cy - half, cx - half, cy - half + corner);
-        // 右上角
+
+        // 右上
         gc.strokeLine(cx + half, cy - half, cx + half - corner, cy - half);
         gc.strokeLine(cx + half, cy - half, cx + half, cy - half + corner);
-        // 左下角
+
+        // 左下
         gc.strokeLine(cx - half, cy + half, cx - half + corner, cy + half);
         gc.strokeLine(cx - half, cy + half, cx - half, cy + half - corner);
-        // 右下角
+
+        // 右下
         gc.strokeLine(cx + half, cy + half, cx + half - corner, cy + half);
         gc.strokeLine(cx + half, cy + half, cx + half, cy + half - corner);
-        // 中心小点
-        gc.setFill(Color.CORNFLOWERBLUE);
-        gc.fillOval(cx - 3, cy - 3, 6, 6);
     }
 }
