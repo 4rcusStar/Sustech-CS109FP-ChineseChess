@@ -48,7 +48,6 @@ public class PointerDetector extends Component
     public void onAwake()
     {
         t = getGameObject().getComponent(Transform.class);
-        System.out.println(getGameObject()+"'s PointerIsAwaken");
     }
 
     static int readyComponents = 0;

@@ -9,6 +9,6 @@ public enum PieceType
     GENERAL,
     CANNON,
     HORSE,
-    //
+
 }
 

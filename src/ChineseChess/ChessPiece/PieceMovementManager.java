@@ -1,6 +1,5 @@
 package ChineseChess.ChessPiece;
 import ChineseChess.ChessBoard.ChessBoardManager;
-import Engine.*;
 import Engine.Components.Component;
 import Engine.Components.PointerDetector;
 import Engine.Components.SpriteRenderer;
@@ -13,6 +12,8 @@ public class PieceMovementManager extends Component
     Transform transform;
     PointerDetector pointerDetector;
     ChessBoardManager chessBoardManager;
+
+    ChessPiece pendingEat =null;
 
     @Override
     public void onAwake()
@@ -43,12 +44,18 @@ public class PieceMovementManager extends Component
         transform.moveTo(tPos[0],tPos[1],velocity);
         chessPieceManager.setCoord(x,y);
         chessBoardManager.setPieceAt((ChessPiece) this.getGameObject(),x,y);
-
+        chessPieceManager.updateValidPlaces();
     }
 
     public void moveTo(int x,int y)
     {
         moveTo(x,y,1000);
+    }
+
+    public void eat(int x,int y)
+    {
+        pendingEat = chessBoardManager.getChessPieceAt(x, y);
+        moveTo(x,y);
     }
 
     public void setTo(int x, int y)
@@ -65,6 +72,20 @@ public class PieceMovementManager extends Component
     @Override
     public void update()
     {
+        if(pendingEat==null)
+            return;
+        if(!transform.isMoving())
+        {
+            onEat();
+        }
+    }
 
+    /**
+     * 在棋子移动到被吃棋子上执行的逻辑
+     */
+    private void onEat()
+    {
+        pendingEat.destroy();
+        pendingEat = null;
     }
 }

@@ -7,6 +7,9 @@ import Engine.Components.SpriteRenderer;
 import Engine.Components.Transform;
 import javafx.scene.image.Image;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ChessPieceManager extends Component
 {
     private final Side side;
@@ -18,6 +21,9 @@ public class ChessPieceManager extends Component
     private int coordY;
     private final int pieceIndex;
     private ChessBoardManager chessBoard;
+
+    List<int[]> movablePlaces = new ArrayList<>();
+    List<int[]> eatablePlaces = new ArrayList<>();
 
     /**
      * 目标棋子是否和本棋子同阵营
@@ -191,6 +197,8 @@ public class ChessPieceManager extends Component
     {
         float[] tPos = ChessBoardManager.coordToTransformPos(coordX,coordY);
         transform.setPosition(tPos[0],tPos[1]);
+        //设置初始可移动/吃子位置
+        updateValidPlaces();
     }
 
     public int getCoordX()
@@ -208,5 +216,122 @@ public class ChessPieceManager extends Component
         this.coordX = coordX;
         this.coordY = coordY;
     }
+
+    /**获取以棋子为原点（0,0）的（x,y）处的棋子：若在棋盘之外或者没有，则返回空
+     *
+     * @param x 相对棋子坐标x
+     * @param y 相对棋子坐标y
+     * @return 棋子为原点（0,0）的（x,y）处的棋子
+     */
+    public ChessPiece getChessPieceRelatively(int x,int y)
+    {
+        int absoluteX = coordX + x;
+        int absoluteY = coordY + y;
+        if(absoluteX>=9||absoluteY>=10)
+            return null;
+        return chessBoard.getChessPieceAt(absoluteX,absoluteY);
+    }
+
+
+    /**
+     * 获取棋子合法的移动位置
+     */
+    public List<int[]> getMovablePlaces()
+    {
+        return movablePlaces;
+    }
+
+    public List<int[]> getEatablePlaces()
+    {
+        return eatablePlaces;
+    }
+
+    /**
+     * 在位置更新后需要调用以更新棋子的合法吃子位置和移动位置
+     */
+    public void updateValidPlaces()
+    {
+        movablePlaces.clear();
+        eatablePlaces.clear();
+
+        //TODO:完成所有棋子的移动逻辑：使用chessBoard.getPlace(i, j)获取位置，在movablePlaces中添加可以移动的位置，在eatablePlaces中添加可以吃子的位置
+        switch(type)
+        {
+            //车的合法移动位置
+            case ROOK ->
+            {
+                // 向右
+                for (int i = coordX + 1; i < 9; i++)
+                {
+                    ChessPiece chessHere = chessBoard.getChessPieceAt(i, coordY);
+                    if (chessHere == null)
+                    {
+                        movablePlaces.add(chessBoard.getPlace(i, coordY));
+                    } else
+                    {
+                        //如果不是同一阵营:
+                        if (!chessHere.getComponent(ChessPieceManager.class).isSameSide((ChessPiece) this.getGameObject()))
+                        {
+                            eatablePlaces.add(chessBoard.getPlace(i, coordY));
+                        }
+                        break;
+                    }
+                }
+                // 向左
+                for (int i = coordX - 1; i >= 0; i--)
+                {
+                    ChessPiece chessHere = chessBoard.getChessPieceAt(i, coordY);
+
+                    if (chessHere == null)
+                    {
+                        movablePlaces.add(chessBoard.getPlace(i, coordY));
+                    } else
+                    {
+                        if (!chessHere.getComponent(ChessPieceManager.class).isSameSide((ChessPiece) this.getGameObject()))
+                        {
+                            eatablePlaces.add(chessBoard.getPlace(i, coordY));
+                        }
+                        break;
+                    }
+                }
+                // 向上
+                for (int j = coordY - 1; j >= 0; j--)
+                {
+                    ChessPiece chessHere = chessBoard.getChessPieceAt(coordX, j);
+
+                    if (chessHere == null)
+                    {
+                        movablePlaces.add(chessBoard.getPlace(coordX, j));
+                    } else
+                    {
+                        if (!chessHere.getComponent(ChessPieceManager.class).isSameSide((ChessPiece) this.getGameObject()))
+                        {
+                            eatablePlaces.add(chessBoard.getPlace(coordX, j));
+                        }
+                        break;
+                    }
+                }
+                // 向下
+                for (int j = coordY + 1; j < 10; j++)
+                {
+                    ChessPiece chessHere = chessBoard.getChessPieceAt(coordX, j);
+
+                    if (chessHere == null)
+                    {
+                        movablePlaces.add(chessBoard.getPlace(coordX, j));
+                    } else
+                    {
+                        if (!chessHere.getComponent(ChessPieceManager.class).isSameSide((ChessPiece) this.getGameObject()))
+                        {
+                            eatablePlaces.add(chessBoard.getPlace(coordX, j));
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+
 
 }

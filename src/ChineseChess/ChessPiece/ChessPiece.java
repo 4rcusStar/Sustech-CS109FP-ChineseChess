@@ -15,5 +15,4 @@ public class ChessPiece extends GameObject
         addComponent(new ChessPieceManager(side,type,pieceIndex));
         addComponent(new PieceMovementManager());
     }
-
 }

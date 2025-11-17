@@ -1,6 +1,7 @@
 package ChineseChess.ChessBoard;
 
 import ChineseChess.ChessPiece.ChessPiece;
+import ChineseChess.ChessPiece.ChessPieceManager;
 import ChineseChess.ChessPiece.PieceMovementManager;
 import Engine.Components.Component;
 import Engine.Components.PointerDetector;
@@ -8,6 +9,10 @@ import Engine.Components.SpriteRenderer;
 import Engine.Components.Transform;
 import Engine.Input;
 import javafx.scene.image.Image;
+
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ChessBoardManager extends Component
 {
@@ -19,6 +24,9 @@ public class ChessBoardManager extends Component
     private int pointingY;
     private ChessPiece[][] chessPieces = new ChessPiece[9][10];
     private ChessPiece selectedChessPiece;
+    private final List<int[]> allPlaces = new LinkedList<>();//表示所有格点
+    private List<int[]> movablePlaces = new LinkedList<>();//当有被选中的棋子时，该变量为棋子可移动至的格点
+    private List<int[]> eatablePlaces = new LinkedList<>();
 
     @Override
     public void onAwake()
@@ -32,6 +40,14 @@ public class ChessBoardManager extends Component
     {
         spriteRenderer.setSprite(sprite);
         spriteRenderer.setSize(800, 800);
+        //构造格点
+        for(int i =0;i<9;i++)
+        {
+            for(int j =0;j<10;j++)
+            {
+                allPlaces.add(new int[]{i,j});
+            }
+        }
     }
 
     /**
@@ -58,19 +74,41 @@ public class ChessBoardManager extends Component
     {
         int coordX;
         int coordY;
-        coordX = (int) ((transX + 40 - 82) / 80.6f);
-        coordY = (int) ((transY + 40 - 52f) / 78f);
+        coordX = Math.min((int) ((transX + 40 - 82) / 80.6f), 8);
+        coordY = Math.min((int) ((transY + 40 - 52f) / 78f), 9);
         return new int[]{coordX, coordY};
+    }
+
+    public int[] getPlace(int coordX, int coordY)
+    {
+        for(int[] place : allPlaces)
+        {
+            if(coordX == place[0] && coordY == place[1])
+            {
+                return place;
+            }
+        }
+        return null;
+    }
+
+    public List<int[]> getMovablePlaces()
+    {
+        return movablePlaces;
+    }
+
+    public List<int[]> getEatablePlaces()
+    {
+        return eatablePlaces;
     }
 
     public int getPointingX()
     {
-        return pointingX<9?pointingX:8;
+        return pointingX < 9 ? pointingX : 8;
     }
 
     public int getPointingY()
     {
-        return pointingY<10?pointingY:9;
+        return pointingY < 10 ? pointingY : 9;
     }
 
 
@@ -78,17 +116,47 @@ public class ChessBoardManager extends Component
     {
         updatePointingStatus();
         //System.out.printf("(%.0f,%.0f)\n",Input.getMouseY(),Input.getMouseX());
-        if(Input.isMouseClicked())
+        if (Input.isMouseClicked())
         {
+            int[] pointedPlace = getPlace(pointingX,pointingY);
             ChessPiece pointedPiece = getChessPieceAt(pointingX,pointingY);
-
-            if(pointedPiece == null&&selectedChessPiece != null)
+            boolean isJustEaten = false;
+            if(selectedChessPiece != null)
             {
-                selectedChessPiece.getComponent(PieceMovementManager.class).moveTo(pointingX,pointingY);
+                if(movablePlaces.contains(pointedPlace))
+                {
+                    selectedChessPiece.getComponent(PieceMovementManager.class).moveTo(pointedPlace[0], pointedPlace[1]);
+                }
+                if(eatablePlaces.contains(pointedPlace))
+                {
+                    selectedChessPiece.getComponent(PieceMovementManager.class).eat(pointedPlace[0], pointedPlace[1]);
+                    isJustEaten = true;
+                }
             }
-
-            selectedChessPiece = pointedPiece;
+            selectedChessPiece = isJustEaten?null:pointedPiece;
+            updateMovablePlaces();
+            updateEatablePlaces();
         }
+        updateMovablePlaces();
+        updateEatablePlaces();
+    }
+
+    /**
+     * 更新选定棋子的可移动范围
+     */
+    private void updateMovablePlaces()
+    {
+        if(selectedChessPiece!=null)
+        {
+            movablePlaces = selectedChessPiece.getComponent(ChessPieceManager.class).getMovablePlaces();
+        }
+
+    }
+
+    private void updateEatablePlaces()
+    {
+        if(selectedChessPiece!=null)
+            eatablePlaces = selectedChessPiece.getComponent(ChessPieceManager.class).getEatablePlaces();
     }
 
     private void updatePointingStatus()

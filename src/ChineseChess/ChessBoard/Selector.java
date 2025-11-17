@@ -6,6 +6,10 @@ import Engine.Components.RendererComponent;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class Selector extends RendererComponent
 {
     private ChessBoardManager board;
@@ -17,11 +21,19 @@ public class Selector extends RendererComponent
     private int selectedY = -1;
 
     private ChessPiece lastSelected;
+    //每个移动点动画开始的时间
+    private Map<String,Long> moveAnimStartTime = new HashMap<>();
+
 
     @Override
     public void onAwake()
     {
         board = getGameObject().getComponent(ChessBoardManager.class);
+    }
+
+    public void onStart()
+    {
+        lastSelected = null;
     }
 
     @Override
@@ -31,15 +43,24 @@ public class Selector extends RendererComponent
         hoverY = board.getPointingY();
 
         //当前被选中的棋子
-        ChessPiece curr = board.getSelectedChessPiece();
-
-        //如果选中状态变化，则刷新固定框位置
-        if (curr != lastSelected)
+        ChessPiece currentSelected = board.getSelectedChessPiece();
+        System.out.println("currentSelected=" + currentSelected);
+        System.out.println("lastSelected=" + lastSelected);
+        System.out.println("movable size=" + board.getMovablePlaces().size());
+        //如果选中状态变化，则刷新固定框位置,刷新动画
+        if (currentSelected != lastSelected)
         {
-            if (curr != null)
+            moveAnimStartTime.clear();
+            if (currentSelected != null)
             {
-                selectedX = curr.getComponent(ChessPieceManager.class).getCoordX();
-                selectedY = curr.getComponent(ChessPieceManager.class).getCoordY();
+                selectedX = currentSelected.getComponent(ChessPieceManager.class).getCoordX();
+                selectedY = currentSelected.getComponent(ChessPieceManager.class).getCoordY();
+                //设置动画时间
+                for(int[]place:board.getMovablePlaces())
+                {
+                    String key = place[0]+"_"+place[1];
+                    moveAnimStartTime.put(key,System.currentTimeMillis());
+                }
             }
             else
             {
@@ -48,16 +69,52 @@ public class Selector extends RendererComponent
             }
         }
 
-        lastSelected = curr;
+        lastSelected = currentSelected;
     }
 
     @Override
     public void render(GraphicsContext gc)
     {
         drawHoverBox(gc);      // 跟随鼠标
-        drawSelectedBox(gc);   // 固定呼吸框
+        drawSelectedBox(gc);
+        drawMovableBoxes(gc);// 固定呼吸框
     }
 
+    private synchronized void drawMovableBoxes(GraphicsContext gc)
+    {
+        if(selectedX<0)return;
+
+        List<int[]> movablePlaces = board.getMovablePlaces();
+        float maxRadius = 22f;//最大半径
+        float duration = 180f;//动画时间
+        long nowTime = System.currentTimeMillis();
+
+        for(int[] place:movablePlaces)
+        {
+            float[] transPos = ChessBoardManager.coordToTransformPos(place[0],place[1]);
+            float centerX = transPos[0]+40;
+            float centerY = transPos[1]+40;
+            String key = place[0]+"_"+place[1];
+            long startTime = moveAnimStartTime.getOrDefault(key,nowTime);
+
+            float t =Math.min(1,(nowTime-startTime)/duration);
+            float scaleWithTime = (float)(1-Math.pow(1-t,2));
+
+            float radius = maxRadius * scaleWithTime;
+            float alpha = 0.4f*scaleWithTime;
+
+            gc.setFill(new Color(0.39215687F, 0.58431375F, 0.92941177F,alpha));//CORN FLOW BLUE
+            gc.fillOval(centerX-radius,centerY-radius,radius*2,radius*2);
+            //System.out.println("t=" + t + ", radius=" + radius + ", alpha=" + alpha);
+        }
+        //System.out.println("movablePlaces=" + movablePlaces.size());
+
+    }
+
+    /**
+     * 渲染随鼠标移动的瞄准框
+     * @param gc gc
+     */
     private void drawHoverBox(GraphicsContext gc)
     {
         float[] pos = ChessBoardManager.coordToTransformPos(hoverX, hoverY);
@@ -68,6 +125,10 @@ public class Selector extends RendererComponent
         drawCornerBox(gc, pos[0], pos[1], 80, 16);
     }
 
+    /**
+     * 渲染选中物体的瞄准框
+     * @param gc
+     */
     private void drawSelectedBox(GraphicsContext gc)
     {
         if (selectedX < 0)
