@@ -94,5 +94,6 @@ public class ChessWorldConstructor extends GameWorldConstructor
         chessBoard.addChild(blackSoldier_4);
         ChessPiece blackSoldier_5 = new ChessPiece(Side.BLACK, PieceType.SOLDIER, 5);
         chessBoard.addChild(blackSoldier_5);
+        //
     }
 }

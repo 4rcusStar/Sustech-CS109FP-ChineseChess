@@ -166,6 +166,7 @@ public class ChessPieceManager extends Component
             }
         }
         spriteRenderer.setSize(80,80);
+        //
     }
 
     public void onStart()
