@@ -61,30 +61,107 @@ public class ChessPieceManager extends Component
     //TODO:完成类型判断
     private void applyInfo()
     {
-        if(side==Side.RED)
+        if(side == Side.RED)
         {
             switch(type)
             {
                 case GENERAL ->
                 {
                     spriteRenderer.setSprite(new Image("file:src/resources/images/red-shuai.png"));
-                    coordX = 4;coordY = 0;
+                    coordX = 4; coordY = 0;
+                }
+                case ADVISOR ->
+                {
+                    spriteRenderer.setSprite(new Image("file:src/resources/images/red-shi.png"));
+                    coordX = pieceIndex == 1 ? 3 : 5;
+                    coordY = 0;
+                }
+                case ELEPHANT ->
+                {
+                    spriteRenderer.setSprite(new Image("file:src/resources/images/red-xiang.png"));
+                    coordX = pieceIndex == 1 ? 2 : 6;
+                    coordY = 0;
+                }
+                case HORSE ->
+                {
+                    spriteRenderer.setSprite(new Image("file:src/resources/images/red-ma.png"));
+                    coordX = pieceIndex == 1 ? 1 : 7;
+                    coordY = 0;
+                }
+                case ROOK ->
+                {
+                    spriteRenderer.setSprite(new Image("file:src/resources/images/red-ju.png"));
+                    coordX = pieceIndex == 1 ? 0 : 8;
+                    coordY = 0;
+                }
+                case CANNON ->
+                {
+                    spriteRenderer.setSprite(new Image("file:src/resources/images/red-pao.png"));
+                    coordX = pieceIndex == 1 ? 1 : 7;
+                    coordY = 2;
+                }
+                case SOLDIER ->
+                {
+                    spriteRenderer.setSprite(new Image("file:src/resources/images/red-bing.png"));
+                    switch(pieceIndex) {
+                        case 1 -> { coordX = 0; coordY = 3; }
+                        case 2 -> { coordX = 2; coordY = 3; }
+                        case 3 -> { coordX = 4; coordY = 3; }
+                        case 4 -> { coordX = 6; coordY = 3; }
+                        case 5 -> { coordX = 8; coordY = 3; }
+                    }
                 }
             }
         }
-        if(side==Side.BLACK)
+        if(side == Side.BLACK)
         {
             switch(type)
             {
                 case GENERAL ->
                 {
                     spriteRenderer.setSprite(new Image("file:src/resources/images/black-jiang.png"));
-                    coordX = 4;coordY = 9;
+                    coordX = 4; coordY = 9;
+                }
+                case ADVISOR ->
+                {
+                    spriteRenderer.setSprite(new Image("file:src/resources/images/black-shi.png"));
+                    coordX = pieceIndex == 1 ? 3 : 5;
+                    coordY = 9;
+                }
+                case ELEPHANT ->
+                {
+                    spriteRenderer.setSprite(new Image("file:src/resources/images/black-xiang.png"));
+                    coordX = pieceIndex == 1 ? 2 : 6;
+                    coordY = 9;
+                }
+                case HORSE ->
+                {
+                    spriteRenderer.setSprite(new Image("file:src/resources/images/black-ma.png"));
+                    coordX = pieceIndex == 1 ? 1 : 7;
+                    coordY = 9;
                 }
                 case ROOK ->
                 {
                     spriteRenderer.setSprite(new Image("file:src/resources/images/black-ju.png"));
-                    coordX = pieceIndex==1?0:8;coordY = 9;
+                    coordX = pieceIndex == 1 ? 0 : 8;
+                    coordY = 9;
+                }
+                case CANNON ->
+                {
+                    spriteRenderer.setSprite(new Image("file:src/resources/images/black-pao.png"));
+                    coordX = pieceIndex == 1 ? 1 : 7;
+                    coordY = 7;
+                }
+                case SOLDIER ->
+                {
+                    spriteRenderer.setSprite(new Image("file:src/resources/images/black-zu.png"));
+                    switch(pieceIndex) {
+                        case 1 -> { coordX = 0; coordY = 6; }
+                        case 2 -> { coordX = 2; coordY = 6; }
+                        case 3 -> { coordX = 4; coordY = 6; }
+                        case 4 -> { coordX = 6; coordY = 6; }
+                        case 5 -> { coordX = 8; coordY = 6; }
+                    }
                 }
             }
         }

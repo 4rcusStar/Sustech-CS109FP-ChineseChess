@@ -3,11 +3,11 @@ package ChineseChess.ChessPiece;
 public enum PieceType
 {
     ROOK,
-    KNIGHT,
+    SOLDIER,
     ELEPHANT,
     ADVISOR,
     GENERAL,
     CANNON,
-    PAWN
+    HORSE,
 }
 
