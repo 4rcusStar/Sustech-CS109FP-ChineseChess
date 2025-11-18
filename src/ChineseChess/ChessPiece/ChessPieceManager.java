@@ -8,7 +8,6 @@ import Engine.Components.Transform;
 import javafx.scene.image.Image;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ChessPieceManager extends Component
@@ -255,8 +254,7 @@ public class ChessPieceManager extends Component
         movablePlaces.clear();
         eatablePlaces.clear();
 
-        //TODO:完成所有棋子的移动逻辑：使用chessBoard.getPlace(i, j)获取位置，在movablePlaces中添加可以移动的位置，在eatablePlaces中添加可以吃子的位置
-        switch(type)
+        switch (type)
         {
             //车的合法移动位置
             case ROOK ->
@@ -341,8 +339,8 @@ public class ChessPieceManager extends Component
                         movablePlaces.add(chessBoard.getPlace(i, coordY));
                     } else
                     {
-                        if(i==8)break;
-                        for(int j=i+1;j<9;j++)
+                        if (i == 8) break;
+                        for (int j = i + 1; j < 9; j++)
                         {
                             ChessPiece chessHere_1 = chessBoard.getChessPieceAt(j, coordY);
                             if (chessHere_1 != null)
@@ -355,7 +353,7 @@ public class ChessPieceManager extends Component
                                 break;
                             }
                         }
-                       break;
+                        break;
                     }
                 }
                 // 向左
@@ -368,8 +366,8 @@ public class ChessPieceManager extends Component
                         movablePlaces.add(chessBoard.getPlace(i, coordY));
                     } else
                     {
-                        if(i==0)break;
-                        for(int j=i-1;j>=0;j--)
+                        if (i == 0) break;
+                        for (int j = i - 1; j >= 0; j--)
                         {
                             ChessPiece chessHere_1 = chessBoard.getChessPieceAt(j, coordY);
                             if (chessHere_1 != null)
@@ -395,8 +393,8 @@ public class ChessPieceManager extends Component
                         movablePlaces.add(chessBoard.getPlace(coordX, j));
                     } else
                     {
-                        if(j==0)break;
-                        for(int i=j-1;i>=0;i--)
+                        if (j == 0) break;
+                        for (int i = j - 1; i >= 0; i--)
                         {
                             ChessPiece chessHere_1 = chessBoard.getChessPieceAt(coordX, i);
                             if (chessHere_1 != null)
@@ -422,8 +420,8 @@ public class ChessPieceManager extends Component
                         movablePlaces.add(chessBoard.getPlace(coordX, j));
                     } else
                     {
-                        if(j==9)break;
-                        for(int i=j+1;i<10;i++)
+                        if (j == 9) break;
+                        for (int i = j + 1; i < 10; i++)
                         {
                             ChessPiece chessHere_1 = chessBoard.getChessPieceAt(coordX, i);
                             if (chessHere_1 != null)
@@ -442,211 +440,274 @@ public class ChessPieceManager extends Component
             }
             case SOLDIER ->
             {
-                if(this.getSide()==Side.RED) {
+                if (this.getSide() == Side.RED)
+                {
                     //过河?
                     if (coordY > 4)
                     {
-                        canmove(coordX+1,coordY);
-                        canmove(coordX-1,coordY);
-                        canmove(coordX,coordY+1);
+                        canMove(coordX + 1, coordY);
+                        canMove(coordX - 1, coordY);
+                        canMove(coordX, coordY + 1);
 
-                    }else{
-                        canmove(coordX,coordY+1);
+                    } else
+                    {
+                        canMove(coordX, coordY + 1);
                     }
-                }else{
+                } else
+                {
                     //过河?
                     if (coordY <= 4)
                     {
-                        canmove(coordX+1,coordY);
-                        canmove(coordX-1,coordY);
-                        canmove(coordX,coordY-1);
+                        canMove(coordX + 1, coordY);
+                        canMove(coordX - 1, coordY);
+                        canMove(coordX, coordY - 1);
 
-                    }else{
-                        canmove(coordX,coordY-1);
+                    } else
+                    {
+                        canMove(coordX, coordY - 1);
                     }
                 }
             }
             case HORSE ->
             {
-                if(isinboard(coordX+1,coordY))
+                if (isInBoard(coordX + 1, coordY))
                 {
-                    if(chessBoard.getChessPieceAt(coordX+1,coordY)==null)
+                    if (chessBoard.getChessPieceAt(coordX + 1, coordY) == null)
                     {
-                        canmove(coordX+2,coordY+1);
-                        canmove(coordX+2,coordY-1);
+                        canMove(coordX + 2, coordY + 1);
+                        canMove(coordX + 2, coordY - 1);
                     }
                 }
-                if(isinboard(coordX-1,coordY))
+                if (isInBoard(coordX - 1, coordY))
                 {
-                    if(chessBoard.getChessPieceAt(coordX-1,coordY)==null)
+                    if (chessBoard.getChessPieceAt(coordX - 1, coordY) == null)
                     {
-                        canmove(coordX-2,coordY+1);
-                        canmove(coordX-2,coordY-1);
+                        canMove(coordX - 2, coordY + 1);
+                        canMove(coordX - 2, coordY - 1);
                     }
                 }
-                if(isinboard(coordX,coordY+1))
+                if (isInBoard(coordX, coordY + 1))
                 {
-                    if(chessBoard.getChessPieceAt(coordX,coordY+1)==null)
+                    if (chessBoard.getChessPieceAt(coordX, coordY + 1) == null)
                     {
-                        canmove(coordX+1,coordY+2);
-                        canmove(coordX-1,coordY+2);
+                        canMove(coordX + 1, coordY + 2);
+                        canMove(coordX - 1, coordY + 2);
                     }
                 }
-                if(isinboard(coordX,coordY-1))
+                if (isInBoard(coordX, coordY - 1))
                 {
-                    if(chessBoard.getChessPieceAt(coordX,coordY-1)==null)
+                    if (chessBoard.getChessPieceAt(coordX, coordY - 1) == null)
                     {
-                        canmove(coordX+1,coordY-2);
-                        canmove(coordX-1,coordY-2);
+                        canMove(coordX + 1, coordY - 2);
+                        canMove(coordX - 1, coordY - 2);
                     }
                 }
             }
-            case ELEPHANT->
-            {
-                if(this.getSide()==Side.RED)
-                {
-                    if(coordY+2<5){
-                        canmove(coordX+2,coordY+2);
-                        canmove(coordX-2,coordY+2);
-                    }
-                    canmove(coordX+2,coordY-2);
-                    canmove(coordX-2,coordY-2);
+            case ELEPHANT -> {
+                int[][] elephantMoves = {{2, 2}, {2, -2}, {-2, 2}, {-2, -2}};
+                int[][] blockPositions = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
 
-                } else
-                {
-                    if(coordY-2>4){
-                        canmove(coordX+2,coordY-2);
-                        canmove(coordX-2,coordY-2);
+                for (int i = 0; i < elephantMoves.length; i++) {
+                    int newX = coordX + elephantMoves[i][0];
+                    int newY = coordY + elephantMoves[i][1];
+                    int blockX = coordX + blockPositions[i][0];
+                    int blockY = coordY + blockPositions[i][1];
+
+                    // 检查目标位置是否在棋盘范围内
+                    if (newX < 0 || newX > 8 || newY < 0 || newY > 9) {
+                        continue;
                     }
-                    canmove(coordX+2,coordY+2);
-                    canmove(coordX-2,coordY+2);
+
+                    // 检查是否过河
+                    boolean isValidRiver = (this.getSide() == Side.RED) ? (newY <= 4) : (newY >= 5);
+                    if (!isValidRiver) {
+                        continue;
+                    }
+
+                    // 检查象眼是否被堵
+                    if (chessBoard.getChessPieceAt(blockX, blockY) != null) {
+                        continue;
+                    }
+
+                    canMove(newX, newY);
                 }
             }
             case ADVISOR ->
             {
-                if(this.getSide()==Side.RED)
+                if (this.getSide() == Side.RED)
                 {
-                    if(coordY+1<3&coordX+1<6){canmove(coordX+1,coordY+1);}
-                    if(coordY+1<3&coordX-1>2){canmove(coordX-1,coordY+1);}
-                    if(coordY-1>-1&coordX+1<6){canmove(coordX+1,coordY-1);}
-                    if(coordY-1>-1&coordX-1>2){canmove(coordX-1,coordY-1);}
+                    if (coordY + 1 < 3 & coordX + 1 < 6)
+                    {
+                        canMove(coordX + 1, coordY + 1);
+                    }
+                    if (coordY + 1 < 3 & coordX - 1 > 2)
+                    {
+                        canMove(coordX - 1, coordY + 1);
+                    }
+                    if (coordY - 1 > -1 & coordX + 1 < 6)
+                    {
+                        canMove(coordX + 1, coordY - 1);
+                    }
+                    if (coordY - 1 > -1 & coordX - 1 > 2)
+                    {
+                        canMove(coordX - 1, coordY - 1);
+                    }
                 } else
                 {
-                    if(coordY+1<10&coordX+1<6){canmove(coordX+1,coordY+1);}
-                    if(coordY+1<10&coordX-1>2){canmove(coordX-1,coordY+1);}
-                    if(coordY-1>6&coordX+1<6){canmove(coordX+1,coordY-1);}
-                    if(coordY-1>6&coordX-1>2){canmove(coordX-1,coordY-1);}
+                    if (coordY + 1 < 10 & coordX + 1 < 6)
+                    {
+                        canMove(coordX + 1, coordY + 1);
+                    }
+                    if (coordY + 1 < 10 & coordX - 1 > 2)
+                    {
+                        canMove(coordX - 1, coordY + 1);
+                    }
+                    if (coordY - 1 > 6 & coordX + 1 < 6)
+                    {
+                        canMove(coordX + 1, coordY - 1);
+                    }
+                    if (coordY - 1 > 6 & coordX - 1 > 2)
+                    {
+                        canMove(coordX - 1, coordY - 1);
+                    }
                 }
             }
             case GENERAL ->
             {
-                if(this.getSide()==Side.RED)
+                if (this.getSide() == Side.RED)
                 {
-                    if(coordX+1<6){canmove(coordX+1,coordY);}
-                    if(coordX-1>2){canmove(coordX-1,coordY);}
-                    if(coordY-1>-1){canmove(coordX,coordY-1);}
-                    if(coordY+1<3){canmove(coordX,coordY+1);}
-                } else {
-                    if (coordY + 1 < 10) {
-                        canmove(coordX, coordY + 1);
+                    if (coordX + 1 < 6)
+                    {
+                        canMove(coordX + 1, coordY);
                     }
-                    if (coordX - 1 > 2) {
-                        canmove(coordX - 1, coordY);
+                    if (coordX - 1 > 2)
+                    {
+                        canMove(coordX - 1, coordY);
                     }
-                    if (coordY - 1 > 6) {
-                        canmove(coordX, coordY - 1);
+                    if (coordY - 1 > -1)
+                    {
+                        canMove(coordX, coordY - 1);
                     }
-                    if (coordX + 1 < 6) {
-                        canmove(coordX + 1, coordY);
+                    if (coordY + 1 < 3)
+                    {
+                        canMove(coordX, coordY + 1);
+                    }
+                } else
+                {
+                    if (coordY + 1 < 10)
+                    {
+                        canMove(coordX, coordY + 1);
+                    }
+                    if (coordX - 1 > 2)
+                    {
+                        canMove(coordX - 1, coordY);
+                    }
+                    if (coordY - 1 > 6)
+                    {
+                        canMove(coordX, coordY - 1);
+                    }
+                    if (coordX + 1 < 6)
+                    {
+                        canMove(coordX + 1, coordY);
                     }
                 }
-                movablePlaces.removeIf(this::generalGudge_1);
+                movablePlaces.removeIf(this::generalJudge_1);
             }
         }
-        if(!type.equals(PieceType.GENERAL)){movablePlaces.removeIf(this::generalGudge_2);}
-        //System.out.println("updatedSuccessfully");
-    }
-    //将帅不能见面
-    public boolean generalGudge_2(int[] moveplace)
-    {
-        boolean a=false;
-        int redgeneralcoordx=chessBoard.getPieceManagerByName("RED_GENERAL_0").getCoordX();
-        int blackgeneralcoordx=chessBoard.getPieceManagerByName("BLACK_GENERAL_0").getCoordX();
-        int redgeneralcoordy=chessBoard.getPieceManagerByName("RED_GENERAL_0").getCoordY();
-        int blackgeneralcoordy=chessBoard.getPieceManagerByName("BLACK_GENERAL_0").getCoordY();
-        if(redgeneralcoordx==blackgeneralcoordx&&redgeneralcoordx==coordX&&coordX!=moveplace[0]&&coordY<blackgeneralcoordy&&coordY>redgeneralcoordy)
+        if (!type.equals(PieceType.GENERAL))
         {
-            a=true;
-            for(int i=redgeneralcoordy+1;i<blackgeneralcoordy;i++)
+            movablePlaces.removeIf(this::generalJudge_2);
+        }
+    }
+
+    //将帅不能见面
+    public boolean generalJudge_2(int[] movePlace)
+    {
+        boolean a = false;
+        ChessPieceManager redGeneral = chessBoard.getPieceManagerByName("RED_GENERAL_0");
+        ChessPieceManager blackGeneral = chessBoard.getPieceManagerByName("BLACK_GENERAL_0");
+        if (redGeneral == null || blackGeneral == null)
+            return false;
+        int redGeneralCoordX = redGeneral.getCoordX();
+        int blackGeneralCoordX = blackGeneral.getCoordX();
+        int redGeneralCoordY = redGeneral.getCoordY();
+        int blackGeneralCoordY = blackGeneral.getCoordY();
+        if (redGeneralCoordX == blackGeneralCoordX && redGeneralCoordX == coordX && coordX != movePlace[0] && coordY < blackGeneralCoordY && coordY > redGeneralCoordY)
+        {
+            a = true;
+            for (int i = redGeneralCoordY + 1; i < blackGeneralCoordY; i++)
             {
-                if(i==coordY){continue;}
-                if(chessBoard.getChessPieceAt(coordX,i)!=null)
+                if (i == coordY)
                 {
-                    a=false;
+                    continue;
+                }
+                if (chessBoard.getChessPieceAt(coordX, i) != null)
+                {
+                    a = false;
                     break;
                 }
             }
         }
-        return  a;
+        return a;
     }
 
-    public boolean generalGudge_1(int[] moveplace)
+    public boolean generalJudge_1(int[] movePlace)
     {
-        boolean a=false;
-        if(this.getSide()==Side.RED)
+        boolean a = false;
+        if (this.getSide() == Side.RED)
         {
-            if(chessBoard.getPieceManagerByName("BLACK_GENERAL_0").getCoordX()==moveplace[0] )
+            if (chessBoard.getPieceManagerByName("BLACK_GENERAL_0").getCoordX() == movePlace[0])
             {
-                a=true;
-                for(int i=coordY+1;i<chessBoard.getPieceManagerByName("BLACK_GENERAL_0").getCoordY();i++)
+                a = true;
+                for (int i = coordY + 1; i < chessBoard.getPieceManagerByName("BLACK_GENERAL_0").getCoordY(); i++)
                 {
-                    if(chessBoard.getChessPieceAt(moveplace[0],i)!=null)
+                    if (chessBoard.getChessPieceAt(movePlace[0], i) != null)
                     {
-                        a=false;
+                        a = false;
                         break;
                     }
                 }
             }
-        }else
+        } else
         {
-            if(chessBoard.getPieceManagerByName("RED_GENERAL_0").getCoordX()==moveplace[0] )
+            if (chessBoard.getPieceManagerByName("RED_GENERAL_0").getCoordX() == movePlace[0])
             {
-                a=true;
-                for(int i=coordY-1;i>chessBoard.getPieceManagerByName("RED_GENERAL_0").getCoordY();i--)
+                a = true;
+                for (int i = coordY - 1; i > chessBoard.getPieceManagerByName("RED_GENERAL_0").getCoordY(); i--)
                 {
-                    if(chessBoard.getChessPieceAt(moveplace[0],i)!=null)
+                    if (chessBoard.getChessPieceAt(movePlace[0], i) != null)
                     {
-                        a=false;
+                        a = false;
                         break;
                     }
                 }
             }
         }
-        return  a;
+        return a;
     }
+
     //能否移动到目标位置(x,y)适用于大部分棋子
-    public void canmove(int x,int y)
+    public void canMove(int x, int y)
     {
-        if(!isinboard(x,y))return;
-        ChessPiece chessHere= chessBoard.getChessPieceAt(x,y);
-        if (chessHere == null) {
-            movablePlaces.add(chessBoard.getPlace(x,y));
-        } else {
+        if (!isInBoard(x, y)) return;
+        ChessPiece chessHere = chessBoard.getChessPieceAt(x, y);
+        if (chessHere == null)
+        {
+            movablePlaces.add(chessBoard.getPlace(x, y));
+        } else
+        {
             //如果不是同一阵营:
-            if (!chessHere.getComponent(ChessPieceManager.class).isSameSide((ChessPiece) this.getGameObject())) {
-                eatablePlaces.add(chessBoard.getPlace(x,y));
+            if (!chessHere.getComponent(ChessPieceManager.class).isSameSide((ChessPiece) this.getGameObject()))
+            {
+                eatablePlaces.add(chessBoard.getPlace(x, y));
             }
         }
     }
+
     //判断（x,y）是否在棋盘内
-    public boolean isinboard(int x,int y)
+    public boolean isInBoard(int x, int y)
     {
-        if(x<0|x>8|y<0|y>9){
-            return false;
-        }
-        else {
-            return true;
-        }
+        return !(x < 0 | x > 8 | y < 0 | y > 9);
     }
 
 
