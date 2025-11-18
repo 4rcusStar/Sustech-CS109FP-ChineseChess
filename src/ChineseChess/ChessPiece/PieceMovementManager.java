@@ -49,12 +49,14 @@ public class PieceMovementManager extends Component
 
     public void moveTo(int x,int y)
     {
-        moveTo(x,y,1000);
+        moveTo(x,y,500);
     }
 
     public void eat(int x,int y)
     {
         pendingEat = chessBoardManager.getChessPieceAt(x, y);
+        //吃子时永远在其他棋子上层显示
+        spriteRenderer.setRenderPriority(1);
         moveTo(x,y);
     }
 
@@ -77,6 +79,7 @@ public class PieceMovementManager extends Component
         if(!transform.isMoving())
         {
             onEat();
+            spriteRenderer.setRenderPriority(0);
         }
     }
 
@@ -85,6 +88,7 @@ public class PieceMovementManager extends Component
      */
     private void onEat()
     {
+        pendingEat.getComponent(SpriteRenderer.class).setRenderPriority(-1);
         pendingEat.destroy();
         pendingEat = null;
     }

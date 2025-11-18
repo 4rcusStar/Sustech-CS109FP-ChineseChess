@@ -5,10 +5,10 @@ import Engine.Core.GameEngine;
 //TODO:完善Transform的层级功能和线性变换
 public class Transform extends Component
 {
-    GameEngine gameEngine =GameEngine.getInstance();
+    GameEngine gameEngine = GameEngine.getInstance();
     private float x;
     private float y;
-    private boolean isMoving=false;
+
 
     //TODO:未来扩展层级位置关系
     private Transform parent;
@@ -23,6 +23,7 @@ public class Transform extends Component
         this.x = x;
         this.y = y;
     }
+
     /**
      *
      * @return x坐标
@@ -31,6 +32,7 @@ public class Transform extends Component
     {
         return x;
     }
+
     /**
      *
      * @return y坐标
@@ -39,8 +41,10 @@ public class Transform extends Component
     {
         return y;
     }
+
     /**
      * 直接设置Transform坐标
+     *
      * @param x 目标X
      * @param y 目标Y
      */
@@ -52,6 +56,7 @@ public class Transform extends Component
 
     /**
      * 移动（dx,dy）
+     *
      * @param dx dx
      * @param dy dy
      */
@@ -61,22 +66,36 @@ public class Transform extends Component
         this.y += dy;
     }
 
-
+    float startX, startY;
     float targetX;
     float targetY;
     float movingVelocity;
+    private boolean isMoving = false;
+    private float totalMovingDistance;
+    private double duration;
+    private double elapsedTime = 0;
+    private float xDistance;
+    private float yDistance;
+
     /**
      * 以匀速从原位置运动到指定位置
-     * @param x 目标x
-     * @param y 目标y
+     *
+     * @param x        目标x
+     * @param y        目标y
      * @param velocity 速度：像素/秒
      */
-    public void moveTo(float x,float y,float velocity)
+    public void moveTo(float x, float y, float velocity)
     {
+        startX = this.x;
+        startY = this.y;
         this.targetX = x;
         this.targetY = y;
         movingVelocity = velocity;
-        isMoving=true;
+        xDistance = x-this.x;
+        yDistance = y-this.y;
+        totalMovingDistance = (float) Math.sqrt((this.x - x) * (this.x - x) + (this.y - y) * (this.y - y));
+        duration = totalMovingDistance / movingVelocity;
+        isMoving = true;
     }
 
     /**
@@ -99,6 +118,7 @@ public class Transform extends Component
 
     /**
      * 设置该Transform的父Transform
+     *
      * @param parent 要设置的父Transform
      */
     public void setParent(Transform parent)
@@ -110,11 +130,26 @@ public class Transform extends Component
     {
         if (!isMoving)
         {
+            elapsedTime=0;
             return;
         }
         long deltaMs = gameEngine.getDeltaTime();
 
-        // 将毫秒转换为秒
+        double deltaSeconds = deltaMs / 1000.0;
+        elapsedTime += deltaSeconds;
+        float scaleWithTime = Math.min((float) (elapsedTime / duration), 1);
+
+        if (scaleWithTime > 0.999)
+        {
+            x = targetX;
+            y = targetY;
+            isMoving = false;
+            return;
+        }
+        float easeOutScale = 1-(1-scaleWithTime)*(1-scaleWithTime);
+        x = startX + easeOutScale * xDistance;
+        y = startY + easeOutScale * yDistance;
+       /* // 将毫秒转换为秒
         double deltaSeconds = deltaMs / 1000.0;
 
         float dx = targetX - x;
@@ -144,7 +179,7 @@ public class Transform extends Component
         double ny = dy / distanceRemain;
 
         x += (float) (nx * moveDist);
-        y += (float) (ny * moveDist);
+        y += (float) (ny * moveDist);*/
     }
 }
 

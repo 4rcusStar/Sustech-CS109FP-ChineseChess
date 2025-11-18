@@ -63,6 +63,7 @@ public class ChessBoardManager extends Component
         transform = getGameObject().getComponent(Transform.class);
         spriteRenderer = getGameObject().getComponent(SpriteRenderer.class);
         pointerDetector = getGameObject().getComponent(PointerDetector.class);
+        spriteRenderer.setRenderPriority(-999);
     }
 
     public void onStart()

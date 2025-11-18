@@ -63,6 +63,7 @@ public class ChessPieceManager extends Component
         spriteRenderer = getGameObject().getComponent(SpriteRenderer.class);
         pointerDetector = getGameObject().getComponent(PointerDetector.class);
         chessBoard = getGameObject().getParent().getComponent(ChessBoardManager.class);
+        spriteRenderer.setRenderPriority(0);
         applyInfo();
     }
 

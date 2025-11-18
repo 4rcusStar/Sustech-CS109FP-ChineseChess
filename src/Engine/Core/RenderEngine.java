@@ -1,13 +1,13 @@
 package Engine.Core;
 
+import Engine.Components.RendererComponent;
 import Engine.GameBuilding.GameWorld;
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -81,7 +81,6 @@ public class RenderEngine
             }
         };
         timer.start();
-
     }
     /**
      * 每次绘制的核心逻辑
@@ -90,9 +89,19 @@ public class RenderEngine
     {
         gc.setFill(Color.BEIGE);
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        for(GameObject rendererObject : rendererObjects)
+        gc.setFill(Color.BEIGE);
+        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        // 收集所有渲染组件并按优先级排序
+        List<RendererComponent> allRenderers = new ArrayList<>();
+        for (GameObject gameObject : rendererObjects)
         {
-            rendererObject.render(gc);
+            allRenderers.addAll(gameObject.collectAllRenderers());
+        }
+        allRenderers.sort(Comparator.comparingInt(RendererComponent::getRenderPriority));
+        // 统一渲染
+        for (RendererComponent renderer : allRenderers)
+        {
+            renderer.render(gc);
         }
     }
 }

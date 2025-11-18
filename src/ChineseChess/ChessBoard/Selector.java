@@ -5,7 +5,6 @@ import ChineseChess.ChessPiece.ChessPieceManager;
 import Engine.Components.RendererComponent;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.ArcType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +31,7 @@ public class Selector extends RendererComponent
     public void onAwake()
     {
         board = getGameObject().getComponent(ChessBoardManager.class);
+        setRenderPriority(999);
     }
 
     public void onStart()
@@ -121,7 +121,7 @@ public class Selector extends RendererComponent
     {
         if (selectedX < 0) return;
         List<int[]> eatablePlaces = new ArrayList<>(board.getEatablePlaces());
-        float crossLength = 60f;
+        float crossLength = 80f;
         float duration = 400f;
         long nowTime = System.currentTimeMillis();
 
@@ -135,7 +135,7 @@ public class Selector extends RendererComponent
             float t =Math.min(1,(nowTime-startTime)/duration);
             float scaleWithTime = (float)(1-Math.pow(1-t,2));
 
-            float alpha = Math.max(0.4f*scaleWithTime,0);
+            float alpha = Math.max(0.6f*scaleWithTime,0);
             float dLength = scaleWithTime * crossLength;
 
             gc.setStroke(new Color(0.75, 0.03, 0.01,alpha));
