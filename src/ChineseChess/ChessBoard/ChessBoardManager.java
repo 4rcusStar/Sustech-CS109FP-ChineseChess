@@ -3,13 +3,13 @@ package ChineseChess.ChessBoard;
 import ChineseChess.ChessPiece.ChessPiece;
 import ChineseChess.ChessPiece.ChessPieceManager;
 import ChineseChess.ChessPiece.PieceMovementManager;
+import ChineseChess.ChessPiece.Side;
 import Engine.Components.Component;
 import Engine.Components.PointerDetector;
 import Engine.Components.SpriteRenderer;
 import Engine.Components.Transform;
 import Engine.Input;
 import javafx.scene.image.Image;
-
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,6 +27,35 @@ public class ChessBoardManager extends Component
     private final List<int[]> allPlaces = new LinkedList<>();//表示所有格点
     private List<int[]> movablePlaces = new LinkedList<>();//当有被选中的棋子时，该变量为棋子可移动至的格点
     private List<int[]> eatablePlaces = new LinkedList<>();
+    public  <T> T[][] deepCopy(T[][] original)
+    {
+        if (original == null) return null;
+        T[][] copy = original.clone();
+        for (int i = 0; i < original.length; i++)
+        {
+            copy[i] = original[i].clone();
+        }
+        return copy;
+    }
+
+    public ChessPieceManager getPieceManagerByName( String name)
+    {
+        ChessPiece[][] currentChessPieces = deepCopy(chessPieces);
+        for(ChessPiece[] i:currentChessPieces)
+        {
+            for(ChessPiece chess:i)
+            {
+                if(chess!=null)
+                {
+                    if(chess.getName().equals(name))
+                    {
+                        return chess.getComponent(ChessPieceManager.class);
+                    }
+                }
+            }
+        }
+        return null;
+    }
 
     @Override
     public void onAwake()

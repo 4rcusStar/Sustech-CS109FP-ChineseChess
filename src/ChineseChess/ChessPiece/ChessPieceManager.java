@@ -8,6 +8,7 @@ import Engine.Components.Transform;
 import javafx.scene.image.Image;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ChessPieceManager extends Component
@@ -329,10 +330,324 @@ public class ChessPieceManager extends Component
                     }
                 }
             }
+            case CANNON ->
+            {
+                // 向右
+                for (int i = coordX + 1; i < 9; i++)
+                {
+                    ChessPiece chessHere = chessBoard.getChessPieceAt(i, coordY);
+                    if (chessHere == null)
+                    {
+                        movablePlaces.add(chessBoard.getPlace(i, coordY));
+                    } else
+                    {
+                        if(i==8)break;
+                        for(int j=i+1;j<9;j++)
+                        {
+                            ChessPiece chessHere_1 = chessBoard.getChessPieceAt(j, coordY);
+                            if (chessHere_1 != null)
+                            {
+                                if (!chessHere_1.getComponent(ChessPieceManager.class).isSameSide((ChessPiece) this.getGameObject()))
+                                {
+                                    eatablePlaces.add(chessBoard.getPlace(j, coordY));
+                                    break;
+                                }
+                                break;
+                            }
+                        }
+                       break;
+                    }
+                }
+                // 向左
+                for (int i = coordX - 1; i >= 0; i--)
+                {
+                    ChessPiece chessHere = chessBoard.getChessPieceAt(i, coordY);
+
+                    if (chessHere == null)
+                    {
+                        movablePlaces.add(chessBoard.getPlace(i, coordY));
+                    } else
+                    {
+                        if(i==0)break;
+                        for(int j=i-1;j>=0;j--)
+                        {
+                            ChessPiece chessHere_1 = chessBoard.getChessPieceAt(j, coordY);
+                            if (chessHere_1 != null)
+                            {
+                                if (!chessHere_1.getComponent(ChessPieceManager.class).isSameSide((ChessPiece) this.getGameObject()))
+                                {
+                                    eatablePlaces.add(chessBoard.getPlace(j, coordY));
+                                    break;
+                                }
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+                // 向上
+                for (int j = coordY - 1; j >= 0; j--)
+                {
+                    ChessPiece chessHere = chessBoard.getChessPieceAt(coordX, j);
+
+                    if (chessHere == null)
+                    {
+                        movablePlaces.add(chessBoard.getPlace(coordX, j));
+                    } else
+                    {
+                        if(j==0)break;
+                        for(int i=j-1;i>=0;i--)
+                        {
+                            ChessPiece chessHere_1 = chessBoard.getChessPieceAt(coordX, i);
+                            if (chessHere_1 != null)
+                            {
+                                if (!chessHere_1.getComponent(ChessPieceManager.class).isSameSide((ChessPiece) this.getGameObject()))
+                                {
+                                    eatablePlaces.add(chessBoard.getPlace(coordX, i));
+                                    break;
+                                }
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+                // 向下
+                for (int j = coordY + 1; j < 10; j++)
+                {
+                    ChessPiece chessHere = chessBoard.getChessPieceAt(coordX, j);
+
+                    if (chessHere == null)
+                    {
+                        movablePlaces.add(chessBoard.getPlace(coordX, j));
+                    } else
+                    {
+                        if(j==9)break;
+                        for(int i=j+1;i<10;i++)
+                        {
+                            ChessPiece chessHere_1 = chessBoard.getChessPieceAt(coordX, i);
+                            if (chessHere_1 != null)
+                            {
+                                if (!chessHere_1.getComponent(ChessPieceManager.class).isSameSide((ChessPiece) this.getGameObject()))
+                                {
+                                    eatablePlaces.add(chessBoard.getPlace(coordX, i));
+                                    break;
+                                }
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+            case SOLDIER ->
+            {
+                if(this.getSide()==Side.RED) {
+                    //过河?
+                    if (coordY > 4)
+                    {
+                        canmove(coordX+1,coordY);
+                        canmove(coordX-1,coordY);
+                        canmove(coordX,coordY+1);
+
+                    }else{
+                        canmove(coordX,coordY+1);
+                    }
+                }else{
+                    //过河?
+                    if (coordY <= 4)
+                    {
+                        canmove(coordX+1,coordY);
+                        canmove(coordX-1,coordY);
+                        canmove(coordX,coordY-1);
+
+                    }else{
+                        canmove(coordX,coordY-1);
+                    }
+                }
+            }
+            case HORSE ->
+            {
+                if(isinboard(coordX+1,coordY))
+                {
+                    if(chessBoard.getChessPieceAt(coordX+1,coordY)==null)
+                    {
+                        canmove(coordX+2,coordY+1);
+                        canmove(coordX+2,coordY-1);
+                    }
+                }
+                if(isinboard(coordX-1,coordY))
+                {
+                    if(chessBoard.getChessPieceAt(coordX-1,coordY)==null)
+                    {
+                        canmove(coordX-2,coordY+1);
+                        canmove(coordX-2,coordY-1);
+                    }
+                }
+                if(isinboard(coordX,coordY+1))
+                {
+                    if(chessBoard.getChessPieceAt(coordX,coordY+1)==null)
+                    {
+                        canmove(coordX+1,coordY+2);
+                        canmove(coordX-1,coordY+2);
+                    }
+                }
+                if(isinboard(coordX,coordY-1))
+                {
+                    if(chessBoard.getChessPieceAt(coordX,coordY-1)==null)
+                    {
+                        canmove(coordX+1,coordY-2);
+                        canmove(coordX-1,coordY-2);
+                    }
+                }
+            }
+            case ELEPHANT->
+            {
+                if(this.getSide()==Side.RED)
+                {
+                    if(coordY+2<5){
+                        canmove(coordX+2,coordY+2);
+                        canmove(coordX-2,coordY+2);
+                    }
+                    canmove(coordX+2,coordY-2);
+                    canmove(coordX-2,coordY-2);
+
+                } else
+                {
+                    if(coordY-2>4){
+                        canmove(coordX+2,coordY-2);
+                        canmove(coordX-2,coordY-2);
+                    }
+                    canmove(coordX+2,coordY+2);
+                    canmove(coordX-2,coordY+2);
+                }
+            }
+            case ADVISOR ->
+            {
+                if(this.getSide()==Side.RED)
+                {
+                    if(coordY+1<3&coordX+1<6){canmove(coordX+1,coordY+1);}
+                    if(coordY+1<3&coordX-1>2){canmove(coordX-1,coordY+1);}
+                    if(coordY-1>-1&coordX+1<6){canmove(coordX+1,coordY-1);}
+                    if(coordY-1>-1&coordX-1>2){canmove(coordX-1,coordY-1);}
+                } else
+                {
+                    if(coordY+1<10&coordX+1<6){canmove(coordX+1,coordY+1);}
+                    if(coordY+1<10&coordX-1>2){canmove(coordX-1,coordY+1);}
+                    if(coordY-1>6&coordX+1<6){canmove(coordX+1,coordY-1);}
+                    if(coordY-1>6&coordX-1>2){canmove(coordX-1,coordY-1);}
+                }
+            }
+            case GENERAL ->
+            {
+                if(this.getSide()==Side.RED)
+                {
+                    if(coordX+1<6){canmove(coordX+1,coordY);}
+                    if(coordX-1>2){canmove(coordX-1,coordY);}
+                    if(coordY-1>-1){canmove(coordX,coordY-1);}
+                    if(coordY+1<3){canmove(coordX,coordY+1);}
+                } else {
+                    if (coordY + 1 < 10) {
+                        canmove(coordX, coordY + 1);
+                    }
+                    if (coordX - 1 > 2) {
+                        canmove(coordX - 1, coordY);
+                    }
+                    if (coordY - 1 > 6) {
+                        canmove(coordX, coordY - 1);
+                    }
+                    if (coordX + 1 < 6) {
+                        canmove(coordX + 1, coordY);
+                    }
+                }
+                movablePlaces.removeIf(this::generalGudge_1);
+            }
         }
+        if(!type.equals(PieceType.GENERAL)){movablePlaces.removeIf(this::generalGudge_2);}
         //System.out.println("updatedSuccessfully");
     }
+    //将帅不能见面
+    public boolean generalGudge_2(int[] moveplace)
+    {
+        boolean a=false;
+        int redgeneralcoordx=chessBoard.getPieceManagerByName("RED_GENERAL_0").getCoordX();
+        int blackgeneralcoordx=chessBoard.getPieceManagerByName("BLACK_GENERAL_0").getCoordX();
+        int redgeneralcoordy=chessBoard.getPieceManagerByName("RED_GENERAL_0").getCoordY();
+        int blackgeneralcoordy=chessBoard.getPieceManagerByName("BLACK_GENERAL_0").getCoordY();
+        if(redgeneralcoordx==blackgeneralcoordx&&redgeneralcoordx==coordX&&coordX!=moveplace[0]&&coordY<blackgeneralcoordy&&coordY>redgeneralcoordy)
+        {
+            a=true;
+            for(int i=redgeneralcoordy+1;i<blackgeneralcoordy;i++)
+            {
+                if(i==coordY){continue;}
+                if(chessBoard.getChessPieceAt(coordX,i)!=null)
+                {
+                    a=false;
+                    break;
+                }
+            }
+        }
+        return  a;
+    }
 
+    public boolean generalGudge_1(int[] moveplace)
+    {
+        boolean a=false;
+        if(this.getSide()==Side.RED)
+        {
+            if(chessBoard.getPieceManagerByName("BLACK_GENERAL_0").getCoordX()==moveplace[0] )
+            {
+                a=true;
+                for(int i=coordY+1;i<chessBoard.getPieceManagerByName("BLACK_GENERAL_0").getCoordY();i++)
+                {
+                    if(chessBoard.getChessPieceAt(moveplace[0],i)!=null)
+                    {
+                        a=false;
+                        break;
+                    }
+                }
+            }
+        }else
+        {
+            if(chessBoard.getPieceManagerByName("RED_GENERAL_0").getCoordX()==moveplace[0] )
+            {
+                a=true;
+                for(int i=coordY-1;i>chessBoard.getPieceManagerByName("RED_GENERAL_0").getCoordY();i--)
+                {
+                    if(chessBoard.getChessPieceAt(moveplace[0],i)!=null)
+                    {
+                        a=false;
+                        break;
+                    }
+                }
+            }
+        }
+        return  a;
+    }
+    //能否移动到目标位置(x,y)适用于大部分棋子
+    public void canmove(int x,int y)
+    {
+        if(!isinboard(x,y))return;
+        ChessPiece chessHere= chessBoard.getChessPieceAt(x,y);
+        if (chessHere == null) {
+            movablePlaces.add(chessBoard.getPlace(x,y));
+        } else {
+            //如果不是同一阵营:
+            if (!chessHere.getComponent(ChessPieceManager.class).isSameSide((ChessPiece) this.getGameObject())) {
+                eatablePlaces.add(chessBoard.getPlace(x,y));
+            }
+        }
+    }
+    //判断（x,y）是否在棋盘内
+    public boolean isinboard(int x,int y)
+    {
+        if(x<0|x>8|y<0|y>9){
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
 
 
 }
