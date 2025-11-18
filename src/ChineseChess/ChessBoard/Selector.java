@@ -5,6 +5,7 @@ import ChineseChess.ChessPiece.ChessPieceManager;
 import Engine.Components.RendererComponent;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.ArcType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,6 +25,7 @@ public class Selector extends RendererComponent
     private ChessPiece lastSelected;
     //每个移动点动画开始的时间
     private Map<String,Long> moveAnimStartTime = new HashMap<>();
+    private Map<String,Long> eatAnimStartTime = new HashMap<>();
 
 
     @Override
@@ -56,8 +58,13 @@ public class Selector extends RendererComponent
                 //设置动画时间
                 for(int[]place:board.getMovablePlaces())
                 {
-                    String key = place[0]+"_"+place[1];
-                    moveAnimStartTime.put(key,System.currentTimeMillis());
+                    String moveKey = place[0]+"_"+place[1];
+                    moveAnimStartTime.put(moveKey,System.currentTimeMillis());
+                }
+                for(int[]place:board.getEatablePlaces())
+                {
+                    String eatKey = place[0]+"_"+place[1];
+                    eatAnimStartTime.put(eatKey,System.currentTimeMillis());
                 }
             }
             else
@@ -74,8 +81,9 @@ public class Selector extends RendererComponent
     public void render(GraphicsContext gc)
     {
         drawHoverBox(gc);      // 跟随鼠标
-        drawSelectedBox(gc);
-        drawMovableBoxes(gc);// 固定呼吸框
+        drawSelectedBox(gc);// 固定呼吸框
+        drawMovableBoxes(gc);
+        drawEatableBoxes(gc);
     }
 
     private synchronized void drawMovableBoxes(GraphicsContext gc)
@@ -106,6 +114,34 @@ public class Selector extends RendererComponent
             //System.out.println("t=" + t + ", radius=" + radius + ", alpha=" + alpha);
         }
         //System.out.println("movablePlaces=" + movablePlaces.size());
+
+    }
+
+    private synchronized void drawEatableBoxes(GraphicsContext gc)
+    {
+        if (selectedX < 0) return;
+        List<int[]> eatablePlaces = new ArrayList<>(board.getEatablePlaces());
+        float crossLength = 60f;
+        float duration = 400f;
+        long nowTime = System.currentTimeMillis();
+
+        for(int[] place:eatablePlaces)
+        {
+            float[] transPos = ChessBoardManager.coordToTransformPos(place[0],place[1]);
+            float currentX = transPos[0];
+            float currentY = transPos[1];
+            String key = place[0]+"_"+place[1];
+            long startTime = eatAnimStartTime.getOrDefault(key,nowTime);
+            float t =Math.min(1,(nowTime-startTime)/duration);
+            float scaleWithTime = (float)(1-Math.pow(1-t,2));
+
+            float alpha = Math.max(0.4f*scaleWithTime,0);
+            float dLength = scaleWithTime * crossLength;
+
+            gc.setStroke(new Color(0.75, 0.03, 0.01,alpha));
+            gc.strokeLine(currentX,currentY,currentX+dLength,currentY+dLength);
+        }
+
 
     }
 
