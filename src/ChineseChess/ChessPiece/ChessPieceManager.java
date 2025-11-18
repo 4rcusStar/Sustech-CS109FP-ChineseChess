@@ -249,7 +249,7 @@ public class ChessPieceManager extends Component
     /**
      * 在位置更新后需要调用以更新棋子的合法吃子位置和移动位置
      */
-    public void updateValidPlaces()
+    public synchronized void updateValidPlaces()
     {
         movablePlaces.clear();
         eatablePlaces.clear();
@@ -330,6 +330,7 @@ public class ChessPieceManager extends Component
                 }
             }
         }
+        //System.out.println("updatedSuccessfully");
     }
 
 

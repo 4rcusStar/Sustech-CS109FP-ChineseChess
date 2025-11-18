@@ -6,6 +6,7 @@ import Engine.Components.RendererComponent;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,9 +45,6 @@ public class Selector extends RendererComponent
 
         //当前被选中的棋子
         ChessPiece currentSelected = board.getSelectedChessPiece();
-        System.out.println("currentSelected=" + currentSelected);
-        System.out.println("lastSelected=" + lastSelected);
-        System.out.println("movable size=" + board.getMovablePlaces().size());
         //如果选中状态变化，则刷新固定框位置,刷新动画
         if (currentSelected != lastSelected)
         {
@@ -84,7 +82,7 @@ public class Selector extends RendererComponent
     {
         if(selectedX<0)return;
 
-        List<int[]> movablePlaces = board.getMovablePlaces();
+        List<int[]> movablePlaces = new ArrayList<>(board.getMovablePlaces());
         float maxRadius = 22f;//最大半径
         float duration = 180f;//动画时间
         long nowTime = System.currentTimeMillis();
@@ -101,7 +99,7 @@ public class Selector extends RendererComponent
             float scaleWithTime = (float)(1-Math.pow(1-t,2));
 
             float radius = maxRadius * scaleWithTime;
-            float alpha = 0.4f*scaleWithTime;
+            float alpha = Math.max(0.4f*scaleWithTime,0);
 
             gc.setFill(new Color(0.39215687F, 0.58431375F, 0.92941177F,alpha));//CORN FLOW BLUE
             gc.fillOval(centerX-radius,centerY-radius,radius*2,radius*2);

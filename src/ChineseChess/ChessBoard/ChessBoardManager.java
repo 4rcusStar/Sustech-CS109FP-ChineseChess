@@ -118,45 +118,44 @@ public class ChessBoardManager extends Component
         //System.out.printf("(%.0f,%.0f)\n",Input.getMouseY(),Input.getMouseX());
         if (Input.isMouseClicked())
         {
-            int[] pointedPlace = getPlace(pointingX,pointingY);
-            ChessPiece pointedPiece = getChessPieceAt(pointingX,pointingY);
+
+            int[] pointedPlace = getPlace(pointingX, pointingY);
+            ChessPiece pointedPiece = getChessPieceAt(pointingX, pointingY);
             boolean isJustEaten = false;
-            if(selectedChessPiece != null)
+            if (selectedChessPiece != null)
             {
-                if(movablePlaces.contains(pointedPlace))
+                if (movablePlaces.contains(pointedPlace))
                 {
                     selectedChessPiece.getComponent(PieceMovementManager.class).moveTo(pointedPlace[0], pointedPlace[1]);
                 }
-                if(eatablePlaces.contains(pointedPlace))
+                if (eatablePlaces.contains(pointedPlace))
                 {
                     selectedChessPiece.getComponent(PieceMovementManager.class).eat(pointedPlace[0], pointedPlace[1]);
                     isJustEaten = true;
                 }
             }
-            selectedChessPiece = isJustEaten?null:pointedPiece;
-            updateMovablePlaces();
-            updateEatablePlaces();
+            selectedChessPiece = isJustEaten ? null : pointedPiece;
+            updateValidPlaces();
+            if (selectedChessPiece != null)
+            {
+                for (int[] place : movablePlaces)
+                {
+                    System.out.println(Arrays.toString(place));
+                }
+            }
         }
-        updateMovablePlaces();
-        updateEatablePlaces();
+        updateValidPlaces();
     }
 
-    /**
-     * 更新选定棋子的可移动范围
-     */
-    private void updateMovablePlaces()
+    public void updateValidPlaces()
     {
         if(selectedChessPiece!=null)
         {
-            movablePlaces = selectedChessPiece.getComponent(ChessPieceManager.class).getMovablePlaces();
+            ChessPieceManager selectedPieceManager =selectedChessPiece.getComponent(ChessPieceManager.class);
+            selectedPieceManager.updateValidPlaces();
+            movablePlaces=selectedPieceManager.getMovablePlaces();
+            eatablePlaces=selectedPieceManager.getEatablePlaces();
         }
-
-    }
-
-    private void updateEatablePlaces()
-    {
-        if(selectedChessPiece!=null)
-            eatablePlaces = selectedChessPiece.getComponent(ChessPieceManager.class).getEatablePlaces();
     }
 
     private void updatePointingStatus()

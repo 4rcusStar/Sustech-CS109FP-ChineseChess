@@ -36,7 +36,7 @@ public class PieceMovementManager extends Component
      * @param y 棋盘坐标y
      * @param velocity 速度
      */
-    public void moveTo(int x,int y,float velocity)
+    public synchronized void moveTo(int x,int y,float velocity)
     {
         float[] tPos = ChessBoardManager.coordToTransformPos(x,y);
         //通知棋盘和棋子更新数据,移动
