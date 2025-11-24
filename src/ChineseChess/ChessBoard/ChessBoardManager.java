@@ -10,7 +10,6 @@ import Engine.Components.SpriteRenderer;
 import Engine.Components.Transform;
 import Engine.Input;
 import javafx.scene.image.Image;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,7 +34,13 @@ public class ChessBoardManager extends Component
 
     private Side currentSide = Side.RED;
 
-    public  <T> T[][] deepCopy(T[][] original)
+    private boolean isRedInCheck = false;//todo:是否被将军
+    private boolean isBlackInCheck = false;
+
+    private boolean isGameOver = false;
+    Side winnerSide = null;
+
+    public <T> T[][] deepCopy(T[][] original)
     {
         if (original == null) return null;
         T[][] copy = original.clone();
@@ -46,16 +51,16 @@ public class ChessBoardManager extends Component
         return copy;
     }
 
-    public ChessPieceManager getPieceManagerByName( String name)
+    public ChessPieceManager getPieceManagerByName(String name)
     {
         ChessPiece[][] currentChessPieces = deepCopy(chessPieces);
-        for(ChessPiece[] i:currentChessPieces)
+        for (ChessPiece[] i : currentChessPieces)
         {
-            for(ChessPiece chess:i)
+            for (ChessPiece chess : i)
             {
-                if(chess!=null)
+                if (chess != null)
                 {
-                    if(chess.getName().equals(name))
+                    if (chess.getName().equals(name))
                     {
                         return chess.getComponent(ChessPieceManager.class);
                     }
@@ -79,11 +84,11 @@ public class ChessBoardManager extends Component
         spriteRenderer.setSprite(sprite);
         spriteRenderer.setSize(800, 800);
         //构造格点
-        for(int i =0;i<9;i++)
+        for (int i = 0; i < 9; i++)
         {
-            for(int j =0;j<10;j++)
+            for (int j = 0; j < 10; j++)
             {
-                allPlaces.add(new int[]{i,j});
+                allPlaces.add(new int[]{i, j});
             }
         }
     }
@@ -105,7 +110,7 @@ public class ChessBoardManager extends Component
 
         float x = baseX + coordX * stepX;
         float y = baseY + coordY * stepY;
-        return new float[]{x-40, y-40};
+        return new float[]{x - 40, y - 40};
     }
 
     public static int[] transformPosToCoord(float transX, float transY)
@@ -119,9 +124,9 @@ public class ChessBoardManager extends Component
 
     public int[] getPlace(int coordX, int coordY)
     {
-        for(int[] place : allPlaces)
+        for (int[] place : allPlaces)
         {
-            if(coordX == place[0] && coordY == place[1])
+            if (coordX == place[0] && coordY == place[1])
             {
                 return place;
             }
@@ -157,6 +162,8 @@ public class ChessBoardManager extends Component
 
     public void update()
     {
+
+        //更新鼠标指针
         updatePointingStatus();
         //System.out.printf("(%.0f,%.0f)\n",Input.getMouseY(),Input.getMouseX());
         if (Input.isMouseClicked())
@@ -167,7 +174,7 @@ public class ChessBoardManager extends Component
             if (selectedChessPiece != null)
             {
                 //如果不是当前回合，则不会选中,也不会执行任何逻辑
-                if(selectedChessPiece.getComponent(ChessPieceManager.class).getSide()!=currentSide)
+                if (selectedChessPiece.getComponent(ChessPieceManager.class).getSide() != currentSide)
                 {
                     selectedChessPiece = pointedPiece;
                     updateValidPlaces();
@@ -178,7 +185,7 @@ public class ChessBoardManager extends Component
                 if (movablePlaces.contains(pointedPlace))
                 {
                     selectedChessPiece.getComponent(PieceMovementManager.class).moveTo(pointedPlace[0], pointedPlace[1]);
-                    switchTurn();
+                    switchTurn();//转换回合
                 }
                 //吃子逻辑
                 if (eatablePlaces.contains(pointedPlace))
@@ -196,12 +203,12 @@ public class ChessBoardManager extends Component
 
     public void updateValidPlaces()
     {
-        if(selectedChessPiece!=null)
+        if (selectedChessPiece != null)
         {
-            ChessPieceManager selectedPieceManager =selectedChessPiece.getComponent(ChessPieceManager.class);
+            ChessPieceManager selectedPieceManager = selectedChessPiece.getComponent(ChessPieceManager.class);
             selectedPieceManager.updateValidPlaces();
-            movablePlaces=selectedPieceManager.getMovablePlaces();
-            eatablePlaces=selectedPieceManager.getEatablePlaces();
+            movablePlaces = selectedPieceManager.getMovablePlaces();
+            eatablePlaces = selectedPieceManager.getEatablePlaces();
         }
     }
 
@@ -210,7 +217,7 @@ public class ChessBoardManager extends Component
         float mouseX = (float) Input.getMouseX();
         float mouseY = (float) Input.getMouseY();
         //检测鼠标是否在界外,若在界外则不更新坐标
-        isMouseInChessBoard=!(mouseX>800||mouseX<0||mouseY>800||mouseY<0);
+        isMouseInChessBoard = !(mouseX > 800 || mouseX < 0 || mouseY > 800 || mouseY < 0);
         if (isMouseInChessBoard)
         {
             pointingX = transformPosToCoord(mouseX, mouseY)[0];
@@ -224,12 +231,32 @@ public class ChessBoardManager extends Component
     public void switchTurn()
     {
         currentSide = (currentSide == Side.RED ? Side.BLACK : Side.RED);
-        System.out.println("Switching turn to"+currentSide);
+        System.out.println("Switching turn to" + currentSide);
+    }
+
+    /**
+     * 检查是否被将军
+     */
+    public void checkIfInCheck()
+    {
+        //TODO:完成逻辑判断isRedInCheck or isBlackInCheck;
+    }
+
+    /**
+     * 检查游戏是否结束
+     */
+    public void CheckIfGameOver()
+    {
+        //TODO:完成逻辑判断是否游戏结束（绝杀或者将帅被吃掉,或者两帅照面）
+        if(isGameOver)
+        {
+            System.out.printf("Game Over,Winner:%s",winnerSide);
+        }
     }
 
     public ChessPiece getChessPieceAt(int x, int y)
     {
-            return chessPieces[x][y];
+        return chessPieces[x][y];
     }
 
     public void setPieceAt(ChessPiece chessPiece, int x, int y)
