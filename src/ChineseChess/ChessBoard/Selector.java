@@ -51,19 +51,26 @@ public class Selector extends RendererComponent
         if (currentSelected != lastSelected)
         {
             moveAnimStartTime.clear();
+            eatAnimStartTime.clear();
             if (currentSelected != null)
             {
+                //如果不是当前回合，则不会选中
+                if(currentSelected.getComponent(ChessPieceManager.class).getSide()!=board.getCurrentSide())
+                    return;
+
+                moveAnimStartTime.clear();
+                eatAnimStartTime.clear();
                 selectedX = currentSelected.getComponent(ChessPieceManager.class).getCoordX();
                 selectedY = currentSelected.getComponent(ChessPieceManager.class).getCoordY();
                 //设置动画时间
                 for(int[]place:board.getMovablePlaces())
                 {
-                    String moveKey = place[0]+"_"+place[1];
+                    String moveKey = "M_"+place[0]+"_"+place[1];
                     moveAnimStartTime.put(moveKey,System.currentTimeMillis());
                 }
                 for(int[]place:board.getEatablePlaces())
                 {
-                    String eatKey = place[0]+"_"+place[1];
+                    String eatKey = "E_"+place[0]+"_"+place[1];
                     eatAnimStartTime.put(eatKey,System.currentTimeMillis());
                 }
             }
@@ -86,7 +93,7 @@ public class Selector extends RendererComponent
         drawEatableBoxes(gc);
     }
 
-    private synchronized void drawMovableBoxes(GraphicsContext gc)
+    private void drawMovableBoxes(GraphicsContext gc)
     {
         if(selectedX<0)return;
 
@@ -100,7 +107,7 @@ public class Selector extends RendererComponent
             float[] transPos = ChessBoardManager.coordToTransformPos(place[0],place[1]);
             float centerX = transPos[0]+40;
             float centerY = transPos[1]+40;
-            String key = place[0]+"_"+place[1];
+            String key = "M_"+place[0]+"_"+place[1];
             long startTime = moveAnimStartTime.getOrDefault(key,nowTime);
 
             float t =Math.min(1,(nowTime-startTime)/duration);
@@ -117,7 +124,7 @@ public class Selector extends RendererComponent
 
     }
 
-    private synchronized void drawEatableBoxes(GraphicsContext gc)
+    private void drawEatableBoxes(GraphicsContext gc)
     {
         if (selectedX < 0) return;
         List<int[]> eatablePlaces = new ArrayList<>(board.getEatablePlaces());
@@ -130,7 +137,7 @@ public class Selector extends RendererComponent
             float[] transPos = ChessBoardManager.coordToTransformPos(place[0],place[1]);
             float currentX = transPos[0];
             float currentY = transPos[1];
-            String key = place[0]+"_"+place[1];
+            String key = "E_"+place[0]+"_"+place[1];
             long startTime = eatAnimStartTime.getOrDefault(key,nowTime);
             float t =Math.min(1,(nowTime-startTime)/duration);
             float scaleWithTime = (float)(1-Math.pow(1-t,2));

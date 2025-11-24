@@ -70,7 +70,6 @@ public class PieceMovementManager extends Component
         chessBoardManager.setPieceAt((ChessPiece) this.getGameObject(),x,y);
     }
 
-    boolean moveStarted = false;
     @Override
     public void update()
     {

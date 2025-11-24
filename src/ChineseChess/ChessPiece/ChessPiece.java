@@ -10,9 +10,10 @@ public class ChessPiece extends GameObject
     public ChessPiece(Side side, PieceType type, int pieceIndex)
     {
         super(side+"_"+type+"_"+pieceIndex);
-        addComponent(new PointerDetector(60,60,1));
+        addComponent(new PointerDetector(80,80,1));
         addComponent(new SpriteRenderer());
         addComponent(new ChessPieceManager(side,type,pieceIndex));
         addComponent(new PieceMovementManager());
+        addComponent(new GlowRenderer());
     }
 }

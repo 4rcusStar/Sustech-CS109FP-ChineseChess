@@ -20,13 +20,21 @@ public class ChessBoardManager extends Component
     SpriteRenderer spriteRenderer;
     PointerDetector pointerDetector;
     Image sprite = new Image("file:src/resources/images/ChessBoard.png");
+
     private int pointingX;
     private int pointingY;
+
     private ChessPiece[][] chessPieces = new ChessPiece[9][10];
     private ChessPiece selectedChessPiece;
+
     private final List<int[]> allPlaces = new LinkedList<>();//表示所有格点
     private List<int[]> movablePlaces = new LinkedList<>();//当有被选中的棋子时，该变量为棋子可移动至的格点
     private List<int[]> eatablePlaces = new LinkedList<>();
+
+    private boolean isMouseInChessBoard = false;
+
+    private Side currentSide = Side.RED;
+
     public  <T> T[][] deepCopy(T[][] original)
     {
         if (original == null) return null;
@@ -142,37 +150,46 @@ public class ChessBoardManager extends Component
     }
 
 
+    public Side getCurrentSide()
+    {
+        return currentSide;
+    }
+
     public void update()
     {
         updatePointingStatus();
         //System.out.printf("(%.0f,%.0f)\n",Input.getMouseY(),Input.getMouseX());
         if (Input.isMouseClicked())
         {
-
             int[] pointedPlace = getPlace(pointingX, pointingY);
             ChessPiece pointedPiece = getChessPieceAt(pointingX, pointingY);
             boolean isJustEaten = false;
             if (selectedChessPiece != null)
             {
+                //如果不是当前回合，则不会选中,也不会执行任何逻辑
+                if(selectedChessPiece.getComponent(ChessPieceManager.class).getSide()!=currentSide)
+                {
+                    selectedChessPiece = pointedPiece;
+                    updateValidPlaces();
+                    return;
+                }
+
+                //动子逻辑
                 if (movablePlaces.contains(pointedPlace))
                 {
                     selectedChessPiece.getComponent(PieceMovementManager.class).moveTo(pointedPlace[0], pointedPlace[1]);
+                    switchTurn();
                 }
+                //吃子逻辑
                 if (eatablePlaces.contains(pointedPlace))
                 {
                     selectedChessPiece.getComponent(PieceMovementManager.class).eat(pointedPlace[0], pointedPlace[1]);
                     isJustEaten = true;
+                    switchTurn();
                 }
             }
             selectedChessPiece = isJustEaten ? null : pointedPiece;
             updateValidPlaces();
-            if (selectedChessPiece != null)
-            {
-                for (int[] place : movablePlaces)
-                {
-                    System.out.println(Arrays.toString(place));
-                }
-            }
         }
         updateValidPlaces();
     }
@@ -192,8 +209,22 @@ public class ChessBoardManager extends Component
     {
         float mouseX = (float) Input.getMouseX();
         float mouseY = (float) Input.getMouseY();
-        pointingX = transformPosToCoord(mouseX, mouseY)[0];
-        pointingY = transformPosToCoord(mouseX, mouseY)[1];
+        //检测鼠标是否在界外,若在界外则不更新坐标
+        isMouseInChessBoard=!(mouseX>800||mouseX<0||mouseY>800||mouseY<0);
+        if (isMouseInChessBoard)
+        {
+            pointingX = transformPosToCoord(mouseX, mouseY)[0];
+            pointingY = transformPosToCoord(mouseX, mouseY)[1];
+        }
+    }
+
+    /**
+     * 切换回合
+     */
+    public void switchTurn()
+    {
+        currentSide = (currentSide == Side.RED ? Side.BLACK : Side.RED);
+        System.out.println("Switching turn to"+currentSide);
     }
 
     public ChessPiece getChessPieceAt(int x, int y)

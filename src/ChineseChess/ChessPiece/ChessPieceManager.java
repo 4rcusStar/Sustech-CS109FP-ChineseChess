@@ -250,7 +250,7 @@ public class ChessPieceManager extends Component
     /**
      * 在位置更新后需要调用以更新棋子的合法吃子位置和移动位置
      */
-    public synchronized void updateValidPlaces()
+    public void updateValidPlaces()
     {
         movablePlaces.clear();
         eatablePlaces.clear();
@@ -655,12 +655,17 @@ public class ChessPieceManager extends Component
     public boolean generalJudge_1(int[] movePlace)
     {
         boolean a = false;
+        ChessPieceManager redGeneral = chessBoard.getPieceManagerByName("RED_GENERAL_0");
+        ChessPieceManager blackGeneral = chessBoard.getPieceManagerByName("BLACK_GENERAL_0");
+        if (redGeneral == null || blackGeneral == null)
+            return false;
         if (this.getSide() == Side.RED)
         {
-            if (chessBoard.getPieceManagerByName("BLACK_GENERAL_0").getCoordX() == movePlace[0])
+
+            if (blackGeneral.getCoordX() == movePlace[0])
             {
                 a = true;
-                for (int i = coordY + 1; i < chessBoard.getPieceManagerByName("BLACK_GENERAL_0").getCoordY(); i++)
+                for (int i = coordY + 1; i < blackGeneral.getCoordY(); i++)
                 {
                     if (chessBoard.getChessPieceAt(movePlace[0], i) != null)
                     {
@@ -671,10 +676,10 @@ public class ChessPieceManager extends Component
             }
         } else
         {
-            if (chessBoard.getPieceManagerByName("RED_GENERAL_0").getCoordX() == movePlace[0])
+            if (redGeneral.getCoordX() == movePlace[0])
             {
                 a = true;
-                for (int i = coordY - 1; i > chessBoard.getPieceManagerByName("RED_GENERAL_0").getCoordY(); i--)
+                for (int i = coordY - 1; i > redGeneral.getCoordY(); i--)
                 {
                     if (chessBoard.getChessPieceAt(movePlace[0], i) != null)
                     {
@@ -708,7 +713,7 @@ public class ChessPieceManager extends Component
     //判断（x,y）是否在棋盘内
     public boolean isInBoard(int x, int y)
     {
-        return !(x < 0 | x > 8 | y < 0 | y > 9);
+        return !(x < 0 || x > 8 ||y < 0 || y > 9);
     }
 
 
