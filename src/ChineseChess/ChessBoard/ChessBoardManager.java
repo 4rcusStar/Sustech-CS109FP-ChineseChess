@@ -10,6 +10,8 @@ import Engine.Components.SpriteRenderer;
 import Engine.Components.Transform;
 import Engine.Input;
 import javafx.scene.image.Image;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -40,6 +42,53 @@ public class ChessBoardManager extends Component
     private boolean isGameOver = false;
     Side winnerSide = null;
 
+
+    List<int[]> eatable_Places = new ArrayList<>();
+
+    public void isRedInCheck()
+    {
+        int[] redGeneralPlace={getPieceManagerByName("redGeneral").getCoordX(),getPieceManagerByName("redGeneral").getCoordY()};
+        for(ChessPiece[] e :chessPieces)
+        {
+            for(ChessPiece chess :e)
+            {
+                if(chess!=null&& chess.getName().startsWith("black"))
+                {
+                    List<int[]> chessEatablePlaces=chess.getComponent(ChessPieceManager.class).getEatablePlaces();
+                    for (int[] place:chessEatablePlaces)
+                    {
+                        if(place==redGeneralPlace)
+                        {
+                            isRedInCheck=true;
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    public void isBlackInCheck()
+    {
+        int[] blackGeneralPlace={getPieceManagerByName("blackGeneral").getCoordX(),getPieceManagerByName("blackGeneral").getCoordY()};
+        for(ChessPiece[] e :chessPieces)
+        {
+            for(ChessPiece chess :e)
+            {
+                if(chess!=null&& chess.getName().startsWith("red"))
+                {
+                    List<int[]> chessEatablePlaces=chess.getComponent(ChessPieceManager.class).getEatablePlaces();
+                    for (int[] place:chessEatablePlaces)
+                    {
+                        if(place==blackGeneralPlace)
+                        {
+                            isBlackInCheck=true;
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    }
     public <T> T[][] deepCopy(T[][] original)
     {
         if (original == null) return null;
@@ -239,6 +288,8 @@ public class ChessBoardManager extends Component
      */
     public void checkIfInCheck()
     {
+        isBlackInCheck();
+        isRedInCheck();
         //TODO:完成逻辑判断isRedInCheck or isBlackInCheck;
     }
 
@@ -248,6 +299,32 @@ public class ChessBoardManager extends Component
     public void CheckIfGameOver()
     {
         //TODO:完成逻辑判断是否游戏结束（绝杀或者将帅被吃掉,或者两帅照面）
+        //将帅被吃
+        boolean isRedGeneralExist=false;
+        boolean isBlackGeneralExist=false;
+
+        for (ChessPiece[] i : chessPieces)
+        {
+            for (ChessPiece chess : i)
+            {
+                if (chess != null)
+                {
+                    if (chess.getName().equals("redGeneral"))
+                    {
+                        isRedGeneralExist=true;
+                    }
+                    if (chess.getName().equals("blackGeneral"))
+                    {
+                        isBlackGeneralExist=true;
+                    }
+                }
+            }
+        }
+        if(!isBlackGeneralExist|!isRedGeneralExist)
+        {
+            isGameOver=true;
+            winnerSide=isBlackGeneralExist?Side.BLACK:Side.RED;
+        }
         if(isGameOver)
         {
             System.out.printf("Game Over,Winner:%s",winnerSide);
