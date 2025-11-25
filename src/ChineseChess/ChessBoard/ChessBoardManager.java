@@ -1,9 +1,6 @@
 package ChineseChess.ChessBoard;
 
-import ChineseChess.ChessPiece.ChessPiece;
-import ChineseChess.ChessPiece.ChessPieceManager;
-import ChineseChess.ChessPiece.PieceMovementManager;
-import ChineseChess.ChessPiece.Side;
+import ChineseChess.ChessPiece.*;
 import Engine.Components.Component;
 import Engine.Components.PointerDetector;
 import Engine.Components.SpriteRenderer;
@@ -11,7 +8,7 @@ import Engine.Components.Transform;
 import Engine.Input;
 import javafx.scene.image.Image;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -42,53 +39,6 @@ public class ChessBoardManager extends Component
     private boolean isGameOver = false;
     Side winnerSide = null;
 
-
-    List<int[]> eatable_Places = new ArrayList<>();
-
-    public void isRedInCheck()
-    {
-        int[] redGeneralPlace={getPieceManagerByName("redGeneral").getCoordX(),getPieceManagerByName("redGeneral").getCoordY()};
-        for(ChessPiece[] e :chessPieces)
-        {
-            for(ChessPiece chess :e)
-            {
-                if(chess!=null&& chess.getName().startsWith("black"))
-                {
-                    List<int[]> chessEatablePlaces=chess.getComponent(ChessPieceManager.class).getEatablePlaces();
-                    for (int[] place:chessEatablePlaces)
-                    {
-                        if(place==redGeneralPlace)
-                        {
-                            isRedInCheck=true;
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    public void isBlackInCheck()
-    {
-        int[] blackGeneralPlace={getPieceManagerByName("blackGeneral").getCoordX(),getPieceManagerByName("blackGeneral").getCoordY()};
-        for(ChessPiece[] e :chessPieces)
-        {
-            for(ChessPiece chess :e)
-            {
-                if(chess!=null&& chess.getName().startsWith("red"))
-                {
-                    List<int[]> chessEatablePlaces=chess.getComponent(ChessPieceManager.class).getEatablePlaces();
-                    for (int[] place:chessEatablePlaces)
-                    {
-                        if(place==blackGeneralPlace)
-                        {
-                            isBlackInCheck=true;
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-    }
     public <T> T[][] deepCopy(T[][] original)
     {
         if (original == null) return null;
@@ -211,7 +161,7 @@ public class ChessBoardManager extends Component
 
     public void update()
     {
-
+        if(isGameOver) return;
         //更新鼠标指针
         updatePointingStatus();
         //System.out.printf("(%.0f,%.0f)\n",Input.getMouseY(),Input.getMouseX());
@@ -234,6 +184,9 @@ public class ChessBoardManager extends Component
                 if (movablePlaces.contains(pointedPlace))
                 {
                     selectedChessPiece.getComponent(PieceMovementManager.class).moveTo(pointedPlace[0], pointedPlace[1]);
+                    checkIfGameOver();
+                    checkIfInCheck();
+
                     switchTurn();//转换回合
                 }
                 //吃子逻辑
@@ -241,6 +194,8 @@ public class ChessBoardManager extends Component
                 {
                     selectedChessPiece.getComponent(PieceMovementManager.class).eat(pointedPlace[0], pointedPlace[1]);
                     isJustEaten = true;
+                    checkIfGameOver();
+                    checkIfInCheck();
                     switchTurn();
                 }
             }
@@ -281,6 +236,8 @@ public class ChessBoardManager extends Component
     {
         currentSide = (currentSide == Side.RED ? Side.BLACK : Side.RED);
         System.out.println("Switching turn to" + currentSide);
+        System.out.println("Black check:"+isBlackInCheck);
+        System.out.println("Red Check:"+isRedInCheck);
     }
 
     /**
@@ -288,45 +245,78 @@ public class ChessBoardManager extends Component
      */
     public void checkIfInCheck()
     {
-        isBlackInCheck();
-        isRedInCheck();
-        //TODO:完成逻辑判断isRedInCheck or isBlackInCheck;
+        if (currentSide == Side.RED)
+            checkIfBlackInCheck();
+        else
+            checkIfRedInCheck();
+    }
+    private void checkIfBlackInCheck()
+    {
+        ChessPieceManager blackGeneral = getPieceManagerByName("BLACK_GENERAL_0");
+        for(ChessPiece[] lines:chessPieces)
+        {
+            for(ChessPiece piece:lines)
+            {
+                if(piece==null) continue;
+                if(blackGeneral==null) return;
+                for(int[] eatablePlace: piece.getComponent(ChessPieceManager.class).getEatablePlaces())
+                {
+                    if (eatablePlace[0] == blackGeneral.getCoordX() && eatablePlace[1] == blackGeneral.getCoordY())
+                    {
+                        isBlackInCheck = true;
+                        return;
+                    }
+                }
+            }
+        }
+    }
+    private void checkIfRedInCheck()
+    {
+        ChessPieceManager redGeneral = getPieceManagerByName("RED_GENERAL_0");
+        for(ChessPiece[] lines:chessPieces)
+        {
+            for(ChessPiece piece:lines)
+            {
+                if(piece==null) continue;
+                if(redGeneral==null) return;
+                for(int[] eatablePlace: piece.getComponent(ChessPieceManager.class).getEatablePlaces())
+                {
+                    if (eatablePlace[0] == redGeneral.getCoordX() && eatablePlace[1] == redGeneral.getCoordY())
+                    {
+                        isRedInCheck = true;
+                        return;
+                    }
+                }
+            }
+        }
     }
 
     /**
      * 检查游戏是否结束
      */
-    public void CheckIfGameOver()
+    public void checkIfGameOver()
     {
-        //TODO:完成逻辑判断是否游戏结束（绝杀或者将帅被吃掉,或者两帅照面）
-        //将帅被吃
         boolean isRedGeneralExist=false;
         boolean isBlackGeneralExist=false;
-
-        for (ChessPiece[] i : chessPieces)
+        for(ChessPiece[] lines:chessPieces)
         {
-            for (ChessPiece chess : i)
+            for(ChessPiece piece:lines)
             {
-                if (chess != null)
+                if(piece==null) continue;
+                ChessPieceManager pieceManager = piece.getComponent(ChessPieceManager.class);
+                if(pieceManager.getType()== PieceType.GENERAL)
                 {
-                    if (chess.getName().equals("redGeneral"))
-                    {
-                        isRedGeneralExist=true;
-                    }
-                    if (chess.getName().equals("blackGeneral"))
-                    {
+                    if(pieceManager.getSide()==Side.BLACK)
                         isBlackGeneralExist=true;
-                    }
+                    else
+                        isRedGeneralExist=true;
                 }
             }
         }
-        if(!isBlackGeneralExist|!isRedGeneralExist)
-        {
-            isGameOver=true;
-            winnerSide=isBlackGeneralExist?Side.BLACK:Side.RED;
-        }
+        isGameOver=!isBlackGeneralExist||!isRedGeneralExist;
         if(isGameOver)
         {
+            winnerSide = isBlackGeneralExist?Side.BLACK:Side.RED;
             System.out.printf("Game Over,Winner:%s",winnerSide);
         }
     }
