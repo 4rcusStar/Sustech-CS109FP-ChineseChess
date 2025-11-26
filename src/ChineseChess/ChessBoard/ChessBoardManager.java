@@ -33,6 +33,21 @@ public class ChessBoardManager extends Component
 
     private Side currentSide = Side.RED;
 
+    public boolean isBlackInCheck()
+    {
+        return isBlackInCheck;
+    }
+
+    public boolean isRedInCheck()
+    {
+        return isRedInCheck;
+    }
+
+    public boolean isGameOver()
+    {
+        return isGameOver;
+    }
+
     private boolean isRedInCheck = false;//todo:是否被将军
     private boolean isBlackInCheck = false;
 

@@ -4,6 +4,7 @@ import ChineseChess.ChessBoard.ChessBoard;
 import ChineseChess.ChessPiece.ChessPiece;
 import ChineseChess.ChessPiece.PieceType;
 import ChineseChess.ChessPiece.Side;
+import ChineseChess.UI.SideBarUI;
 import Engine.Core.GameObject;
 import Engine.GameBuilding.GameWorldConstructor;
 
@@ -12,6 +13,9 @@ public class ChessWorldConstructor extends GameWorldConstructor
     @Override
     public void construct(GameObject root)
     {
+        SideBarUI sideBarUI = new SideBarUI();
+        root.addChild(sideBarUI);
+
         ChessBoard chessBoard = new ChessBoard("ChessBoard");
         root.addChild(chessBoard);
 
