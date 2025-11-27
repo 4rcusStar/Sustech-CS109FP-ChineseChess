@@ -8,7 +8,7 @@ import Engine.Components.Transform;
 import Engine.Input;
 import javafx.scene.image.Image;
 
-import java.util.Arrays;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -48,11 +48,22 @@ public class ChessBoardManager extends Component
         return isGameOver;
     }
 
-    private boolean isRedInCheck = false;//todo:是否被将军
+    private boolean isRedInCheck = false;
     private boolean isBlackInCheck = false;
 
     private boolean isGameOver = false;
     Side winnerSide = null;
+
+    /**
+     * 返回胜利方，如果游戏没有结束，返回null
+     * @return 胜利方
+     */
+    public Side getWinnerSide()
+    {
+        if(!isGameOver)
+            return null;
+        return winnerSide;
+    }
 
     public <T> T[][] deepCopy(T[][] original)
     {
