@@ -8,11 +8,30 @@ public class GameWorld
 {
     //场景入口节点
     private GameObject root;
+    //场景搭建者：
+    private GameWorldConstructor gameWorldConstructor;
 
     public GameWorld(GameWorldConstructor gameWorldConstructor)
     {
+        this.gameWorldConstructor = gameWorldConstructor;
         root = new GameObject("SceneRoot");
-        gameWorldConstructor.construct(root);
+        if(gameWorldConstructor!=null)
+            gameWorldConstructor.construct(root);
+    }
+
+    /**
+     * 场景进入时调用
+     */
+    public void onEnter()
+    {
+        //如果此时场景还没有搭建，则搭建场景
+        if(root.getChildren().isEmpty()&&gameWorldConstructor!=null)
+            gameWorldConstructor.construct(root);
+    }
+
+    public void onExit()
+    {
+        
     }
 
     public GameObject getRoot()

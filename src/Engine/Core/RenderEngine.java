@@ -21,6 +21,7 @@ public class RenderEngine
     private Canvas canvas;//渲染所用的canvas
     private GraphicsContext gc;//canvas所持有的GraphicsContext(目前为2d)
     private Set<GameObject> rendererObjects = new LinkedHashSet<>();
+    private GameWorld gameWorld;
     private RenderEngine(Canvas canvas)
     {
         this.canvas= canvas;
@@ -56,7 +57,17 @@ public class RenderEngine
     public void registerGameWorld(GameWorld gameWorld)
     {
         GameObject root = gameWorld.getRoot();
+        this.gameWorld = gameWorld;
         registerRenderer(root);
+    }
+    public void unregisterGameWorld()
+    {
+        if(gameWorld !=null)
+        {
+            unregisterRenderer(gameWorld.getRoot());
+            gameWorld = null;
+        }
+    
     }
     /**
      * 单独地将要渲染的组件加入引擎中
@@ -65,6 +76,11 @@ public class RenderEngine
     public void registerRenderer(GameObject rendererObject)
     {
         rendererObjects.add(rendererObject);
+    }
+    public void unregisterRenderer(GameObject rendererObject)
+    {
+        if(rendererObject !=null&&rendererObjects.contains(rendererObject))
+            rendererObjects.remove(rendererObject);
     }
 
     /**启动渲染循环
