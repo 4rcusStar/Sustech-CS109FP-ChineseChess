@@ -187,6 +187,7 @@ public class ChessBoardManager extends Component
 
     public void update()
     {
+
         if(isGameOver) return;
         //更新鼠标指针
         updatePointingStatus();
@@ -202,7 +203,7 @@ public class ChessBoardManager extends Component
                 if (selectedChessPiece.getComponent(ChessPieceManager.class).getSide() != currentSide)
                 {
                     selectedChessPiece = pointedPiece;
-                    updateValidPlaces();
+                    updateSelectedValidPlaces();
                     return;
                 }
 
@@ -211,8 +212,8 @@ public class ChessBoardManager extends Component
                 {
                     selectedChessPiece.getComponent(PieceMovementManager.class).moveTo(pointedPlace[0], pointedPlace[1]);
                     checkIfGameOver();
+                    updateAllPlaces();
                     checkIfInCheck();
-
                     switchTurn();//转换回合
                 }
                 //吃子逻辑
@@ -221,17 +222,19 @@ public class ChessBoardManager extends Component
                     selectedChessPiece.getComponent(PieceMovementManager.class).eat(pointedPlace[0], pointedPlace[1]);
                     isJustEaten = true;
                     checkIfGameOver();
+                    updateAllPlaces();
                     checkIfInCheck();
                     switchTurn();
+
                 }
             }
+            updateAllPlaces();
             selectedChessPiece = isJustEaten ? null : pointedPiece;
-            updateValidPlaces();
         }
-        updateValidPlaces();
+        updateSelectedValidPlaces();
     }
 
-    public void updateValidPlaces()
+    public void updateSelectedValidPlaces()
     {
         if (selectedChessPiece != null)
         {
@@ -239,6 +242,21 @@ public class ChessBoardManager extends Component
             selectedPieceManager.updateValidPlaces();
             movablePlaces = selectedPieceManager.getMovablePlaces();
             eatablePlaces = selectedPieceManager.getEatablePlaces();
+        }
+    }
+
+    public void updateAllPlaces()
+    {
+        ChessPiece[][] allPieces = deepCopy(chessPieces);
+        for(ChessPiece[] line : allPieces)
+        {
+            for(ChessPiece p :line)
+            {
+                if(p==null) continue;
+
+                ChessPieceManager pManager = p.getComponent(ChessPieceManager.class);
+                pManager.updateValidPlaces();
+            }
         }
     }
 
@@ -261,9 +279,8 @@ public class ChessBoardManager extends Component
     public void switchTurn()
     {
         currentSide = (currentSide == Side.RED ? Side.BLACK : Side.RED);
-        System.out.println("Switching turn to" + currentSide);
-        System.out.println("Black check:"+isBlackInCheck);
-        System.out.println("Red Check:"+isRedInCheck);
+        System.out.println(isBlackInCheck);
+        System.out.println(isRedInCheck);
     }
 
     /**
@@ -271,21 +288,19 @@ public class ChessBoardManager extends Component
      */
     public void checkIfInCheck()
     {
-        if (currentSide == Side.RED)
-            checkIfBlackInCheck();
-        else
-            checkIfRedInCheck();
+        checkIfBlackInCheck();
+        checkIfRedInCheck();
     }
     private void checkIfBlackInCheck()
     {
         ChessPieceManager blackGeneral = getPieceManagerByName("BLACK_GENERAL_0");
         for(ChessPiece[] lines:chessPieces)
         {
-            for(ChessPiece piece:lines)
+            for (ChessPiece piece : lines)
             {
-                if(piece==null) continue;
-                if(blackGeneral==null) return;
-                for(int[] eatablePlace: piece.getComponent(ChessPieceManager.class).getEatablePlaces())
+                if (piece == null) continue;
+                if (blackGeneral == null) return;
+                for (int[] eatablePlace : piece.getComponent(ChessPieceManager.class).getEatablePlaces())
                 {
                     if (eatablePlace[0] == blackGeneral.getCoordX() && eatablePlace[1] == blackGeneral.getCoordY())
                     {
@@ -295,6 +310,7 @@ public class ChessBoardManager extends Component
                 }
             }
         }
+        isBlackInCheck = false;
     }
     private void checkIfRedInCheck()
     {
@@ -315,6 +331,7 @@ public class ChessBoardManager extends Component
                 }
             }
         }
+        isRedInCheck = false;
     }
 
     /**
