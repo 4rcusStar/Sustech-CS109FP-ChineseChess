@@ -7,7 +7,7 @@ import java.util.Map;
 public class GameWorldManager
 {
     private static GameWorldManager instance;
-    private Map<String, GameWorld> gameWorlds;
+    private Map<String, GameWorldConstructor> gameWorldConstructors;
     private GameWorld currentGameWorld;
     private String currentWorldName;
     private GameEngine gameEngine;
@@ -15,7 +15,7 @@ public class GameWorldManager
 
     private GameWorldManager()
     {
-        gameWorlds = new HashMap<>();
+        gameWorldConstructors = new HashMap<>();
     }
 
     public static GameWorldManager getInstance()
@@ -40,9 +40,9 @@ public class GameWorldManager
      * @param worldName 场景名字
      * @param gameWorld 场景
      */
-    public void registerGameWorld(String worldName, GameWorld gameWorld)
+    public void registerGameWorldConstructor(String worldName, GameWorldConstructor gameWorldConstructor)
     {
-        gameWorlds.put(worldName, gameWorld);
+        gameWorldConstructors.put(worldName, gameWorldConstructor);
     }
 
     public void switchGameWorldTo(String worldName)
@@ -53,15 +53,18 @@ public class GameWorldManager
             currentGameWorld.onExit();
         }
         //切换
-        GameWorld newGameWorld = gameWorlds.get(worldName);
-        if(newGameWorld != null)
+        GameWorldConstructor constructor = gameWorldConstructors.get(worldName);
+        if(constructor == null)
         {
-            currentGameWorld = newGameWorld;
-            currentWorldName = worldName;
-            updateEngineRegistration();
-
-            currentGameWorld.onEnter();
+            System.err.println("Warning: GameWorld '" + worldName + "' not found!");
+            return;
         }
+        
+        GameWorld newGameWorld = new GameWorld(constructor);
+        currentGameWorld = newGameWorld;
+        currentWorldName = worldName;
+        updateEngineRegistration();
+        currentGameWorld.onEnter();
     }
 
     /**

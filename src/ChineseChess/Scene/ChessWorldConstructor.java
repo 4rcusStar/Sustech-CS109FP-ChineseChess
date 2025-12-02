@@ -1,4 +1,4 @@
-package ChineseChess;
+package ChineseChess.Scene;
 
 import ChineseChess.ChessBoard.ChessBoard;
 import ChineseChess.ChessPiece.ChessPiece;

@@ -1,5 +1,7 @@
 package Engine.Core;
 import Engine.Input;
+import Engine.GameBuilding.GameWorld;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +9,7 @@ public class GameEngine
 {
     private static GameEngine instance;
     private List<GameObject> gameObjects = new ArrayList<>();
+    private GameWorld gameWorld;
     private boolean isRunning = false;
     private long lastUpdateTime;
     private final int targetFPS = 60;
@@ -25,9 +28,32 @@ public class GameEngine
         return instance;
     }
 
+    public void registerGameWorld(GameWorld gameWorld)
+    {
+        if(this.gameWorld ==null)
+        {
+            this.gameWorld = gameWorld;
+            registerGameObject(gameWorld.getRoot());
+        }
+    }
+    public void unregisterGameWorld()
+    {
+        if(this.gameWorld !=null)
+        {
+            unregisterGameObject(gameWorld.getRoot());
+            gameWorld = null;
+        }
+    }
     public void registerGameObject(GameObject gameObject)
     {
-        gameObjects.add(gameObject);
+        if(gameObject !=null&&!gameObjects.contains(gameObject))
+            gameObjects.add(gameObject);
+    }
+
+    public void unregisterGameObject(GameObject gameObject)
+    {
+        if(gameObject !=null&&gameObjects.contains(gameObject))
+            gameObjects.remove(gameObject);
     }
 
     /**

@@ -39,9 +39,7 @@ public class GameStarter extends Application
     @Override
     public void start(Stage stage)
     {
-        GameWorld gameWorld = new GameWorld(_gameWorldConstructor);
-        GameObject root = gameWorld.getRoot();
-        engine.registerGameObject(root);
+        
 
         //初始化渲染器
         Canvas canvas = new Canvas(_canvasWidth, _canvasHeight);
@@ -49,8 +47,11 @@ public class GameStarter extends Application
         Input.bindCanvas(canvas);
 
         renderEngine.startRenderLoop();
-        renderEngine.registerGameWorld(gameWorld);
         engine.runEngine();
+
+        GameWorldManager worldManager = GameWorldManager.getInstance();
+        worldManager.initialize(engine, renderEngine);
+        worldManager.switchGameWorldTo("MainMenu");
 
         //JavaFX 场景
         Scene fxScene = new Scene(new StackPane(canvas));
