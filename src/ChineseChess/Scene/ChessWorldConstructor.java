@@ -13,6 +13,7 @@ public class ChessWorldConstructor extends GameWorldConstructor
     @Override
     public void construct(GameObject root)
     {
+        System.out.println("ChessWorldConstructor construct");
         SideBarUI sideBarUI = new SideBarUI();
         root.addChild(sideBarUI);
 

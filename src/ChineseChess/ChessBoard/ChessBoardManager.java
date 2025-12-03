@@ -14,6 +14,8 @@ import java.util.List;
 
 public class ChessBoardManager extends Component
 {
+    private static int boardCount=0;
+
     Transform transform;
     SpriteRenderer spriteRenderer;
     PointerDetector pointerDetector;
@@ -102,6 +104,8 @@ public class ChessBoardManager extends Component
         spriteRenderer = getGameObject().getComponent(SpriteRenderer.class);
         pointerDetector = getGameObject().getComponent(PointerDetector.class);
         spriteRenderer.setRenderPriority(-999);
+        boardCount++;
+        System.out.printf("boardCount: %d\n",boardCount);
     }
 
     public void onStart()
@@ -197,39 +201,98 @@ public class ChessBoardManager extends Component
             int[] pointedPlace = getPlace(pointingX, pointingY);
             ChessPiece pointedPiece = getChessPieceAt(pointingX, pointingY);
             boolean isJustEaten = false;
-            if (selectedChessPiece != null)
+            boolean isJustMoved = false;
+            // 情况一：当前没有选中的棋子
+            if (selectedChessPiece == null)
             {
-                //如果不是当前回合，则不会选中,也不会执行任何逻辑
-                if (selectedChessPiece.getComponent(ChessPieceManager.class).getSide() != currentSide)
+                if (pointedPiece != null)
                 {
-                    selectedChessPiece = pointedPiece;
-                    updateSelectedValidPlaces();
-                    return;
+                    ChessPieceManager pManager = pointedPiece.getComponent(ChessPieceManager.class);
+                    // 只有在当前回合一方时才允许选中
+                    if (pManager != null && pManager.getSide() == currentSide)
+                    {
+                        selectedChessPiece = pointedPiece;
+                        updateSelectedValidPlaces();
+                    }
+                    else
+                    {
+                        selectedChessPiece = null;
+                        movablePlaces.clear();
+                        eatablePlaces.clear();
+                    }
                 }
-
-                //动子逻辑
-                if (movablePlaces.contains(pointedPlace))
+                else
                 {
-                    selectedChessPiece.getComponent(PieceMovementManager.class).moveTo(pointedPlace[0], pointedPlace[1]);
-                    checkIfGameOver();
-                    updateAllPlaces();
-                    checkIfInCheck();
-                    switchTurn();//转换回合
+                    // 点在空格上，取消选中
+                    selectedChessPiece = null;
+                    movablePlaces.clear();
+                    eatablePlaces.clear();
                 }
-                //吃子逻辑
-                if (eatablePlaces.contains(pointedPlace))
+                updateAllPlaces();
+            }
+            // 情况二：已经有选中的棋子
+            else
+            {
+                ChessPieceManager selectedManager = selectedChessPiece.getComponent(ChessPieceManager.class);
+                // 如果当前选中的棋子不属于当前回合，则先按“无选中”重新处理本次点击
+                if (selectedManager == null || selectedManager.getSide() != currentSide)
                 {
-                    selectedChessPiece.getComponent(PieceMovementManager.class).eat(pointedPlace[0], pointedPlace[1]);
-                    isJustEaten = true;
-                    checkIfGameOver();
-                    updateAllPlaces();
-                    checkIfInCheck();
-                    switchTurn();
+                    selectedChessPiece = null;
+                    movablePlaces.clear();
+                    eatablePlaces.clear();
 
+                    if (pointedPiece != null)
+                    {
+                        ChessPieceManager pManager = pointedPiece.getComponent(ChessPieceManager.class);
+                        if (pManager != null && pManager.getSide() == currentSide)
+                        {
+                            selectedChessPiece = pointedPiece;
+                            updateSelectedValidPlaces();
+                        }
+                    }
+                    updateAllPlaces();
+                }
+                else
+                {
+                    // 走子
+                    if (pointedPlace != null && movablePlaces.contains(pointedPlace))
+                    {
+                        selectedChessPiece.getComponent(PieceMovementManager.class).moveTo(pointedPlace[0], pointedPlace[1]);
+                        isJustMoved = true;
+                        checkIfGameOver();
+                        updateAllPlaces();
+                        checkIfInCheck();
+                        switchTurn();
+                    }
+                    // 吃子逻辑
+                    else if (pointedPlace != null && eatablePlaces.contains(pointedPlace))
+                    {
+                        selectedChessPiece.getComponent(PieceMovementManager.class).eat(pointedPlace[0], pointedPlace[1]);
+                        isJustEaten = true;
+                        checkIfGameOver();
+                        updateAllPlaces();
+                        checkIfInCheck();
+                        switchTurn();
+                    }
+                    // 切换
+                    else if (pointedPiece != null)
+                    {
+                        ChessPieceManager pManager = pointedPiece.getComponent(ChessPieceManager.class);
+                        if (pManager != null && pManager.getSide() == currentSide)
+                        {
+                            selectedChessPiece = pointedPiece;
+                            updateSelectedValidPlaces();
+                            updateAllPlaces();
+                        }
+                    }
+
+                    // 若刚刚完成操作，则取消选中
+                    if (isJustEaten||isJustMoved)
+                    {
+                        selectedChessPiece = null;
+                    }
                 }
             }
-            updateAllPlaces();
-            selectedChessPiece = isJustEaten ? null : pointedPiece;
         }
         updateSelectedValidPlaces();
     }

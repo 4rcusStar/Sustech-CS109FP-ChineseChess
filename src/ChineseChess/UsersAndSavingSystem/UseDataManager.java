@@ -1,6 +1,4 @@
 package ChineseChess.UsersAndSavingSystem;
-
-
 import java.io.*;
 import java.nio.file.*;
 import java.time.LocalDateTime;
@@ -72,6 +70,7 @@ public class UseDataManager
         if(parts.length != 5)
         {
             return null;
+        }
         UUID uuid = UUID.fromString(parts[0]);
         String userName = parts[1];
         String password = parts[2];
@@ -80,6 +79,7 @@ public class UseDataManager
 
         User user = new User(uuid, userName, password, registerTime, lastLoginTime);
 
+        return user;
     }
 
     /**

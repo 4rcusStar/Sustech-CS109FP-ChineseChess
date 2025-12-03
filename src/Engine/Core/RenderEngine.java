@@ -56,6 +56,11 @@ public class RenderEngine
 
     public void registerGameWorld(GameWorld gameWorld)
     {
+        // 先清理旧的场景（如果存在）
+        if(this.gameWorld != null)
+        {
+            unregisterGameWorld();
+        }
         GameObject root = gameWorld.getRoot();
         this.gameWorld = gameWorld;
         registerRenderer(root);

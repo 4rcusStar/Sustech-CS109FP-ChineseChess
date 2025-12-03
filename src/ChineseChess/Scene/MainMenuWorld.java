@@ -1,5 +1,6 @@
 package ChineseChess.Scene;
 
+import Engine.GameBuilding.GameStarter;
 import Engine.GameBuilding.GameWorld;
 import Engine.Components.RendererComponent;
 import Engine.GameBuilding.GameWorldManager;
@@ -20,7 +21,7 @@ public class MainMenuWorld extends GameWorld
     @Override
     public void onEnter()
     {
-        super.onEnter();
+        super.onEnter(); 
     }
 
     @Override

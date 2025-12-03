@@ -29,6 +29,7 @@ public class GlowRenderer extends RendererComponent
         if (piece.getSide() != board.getCurrentSide())
             return;
 
+
         float x = transform.getX();
         float y = transform.getY();
 

@@ -15,8 +15,6 @@ public class GameWorld
     {
         this.gameWorldConstructor = gameWorldConstructor;
         root = new GameObject("SceneRoot");
-        if(gameWorldConstructor!=null)
-            gameWorldConstructor.construct(root);
     }
 
     /**

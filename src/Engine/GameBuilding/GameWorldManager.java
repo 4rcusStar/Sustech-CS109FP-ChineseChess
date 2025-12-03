@@ -4,10 +4,13 @@ import Engine.Core.GameEngine;
 import Engine.Core.RenderEngine;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
+
 public class GameWorldManager
 {
     private static GameWorldManager instance;
-    private Map<String, GameWorldConstructor> gameWorldConstructors;
+    private Map<String, Supplier<GameWorld>> worldFactories;
+    private Map<String, GameWorld> cachedWorlds;
     private GameWorld currentGameWorld;
     private String currentWorldName;
     private GameEngine gameEngine;
@@ -15,7 +18,8 @@ public class GameWorldManager
 
     private GameWorldManager()
     {
-        gameWorldConstructors = new HashMap<>();
+        worldFactories = new HashMap<>();
+        cachedWorlds = new HashMap<>();
     }
 
     public static GameWorldManager getInstance()
@@ -36,31 +40,37 @@ public class GameWorldManager
     }
 
     /**
-     * 注册场景
+     * 注册场景工厂
      * @param worldName 场景名字
-     * @param gameWorld 场景
+     * @param factory 场景工厂方法
      */
-    public void registerGameWorldConstructor(String worldName, GameWorldConstructor gameWorldConstructor)
+    public void registerGameWorld(String worldName, Supplier<GameWorld> factory)
     {
-        gameWorldConstructors.put(worldName, gameWorldConstructor);
+        worldFactories.put(worldName, factory);
     }
 
     public void switchGameWorldTo(String worldName)
     {
+        System.out.println("switchGameWorldTo: " + worldName);
         //退出当前
         if(currentGameWorld != null)
         {
             currentGameWorld.onExit();
         }
-        //切换
-        GameWorldConstructor constructor = gameWorldConstructors.get(worldName);
-        if(constructor == null)
+        //切换：使用工厂方法创建或获取缓存的实例
+        GameWorld newGameWorld = cachedWorlds.get(worldName);
+        if(newGameWorld == null)
         {
-            System.err.println("Warning: GameWorld '" + worldName + "' not found!");
-            return;
+            Supplier<GameWorld> factory = worldFactories.get(worldName);
+            if(factory == null)
+            {
+                System.err.println("Warning: GameWorld factory for '" + worldName + "' not found!");
+                return;
+            }
+            newGameWorld = factory.get();
+            cachedWorlds.put(worldName, newGameWorld);
         }
         
-        GameWorld newGameWorld = new GameWorld(constructor);
         currentGameWorld = newGameWorld;
         currentWorldName = worldName;
         updateEngineRegistration();

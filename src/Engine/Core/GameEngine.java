@@ -30,11 +30,13 @@ public class GameEngine
 
     public void registerGameWorld(GameWorld gameWorld)
     {
-        if(this.gameWorld ==null)
+        // 先清理旧的场景（如果存在）
+        if(this.gameWorld != null)
         {
-            this.gameWorld = gameWorld;
-            registerGameObject(gameWorld.getRoot());
+            unregisterGameWorld();
         }
+        this.gameWorld = gameWorld;
+        registerGameObject(gameWorld.getRoot());
     }
     public void unregisterGameWorld()
     {

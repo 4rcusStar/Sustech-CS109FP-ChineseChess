@@ -262,7 +262,7 @@ public class GameObject
         }
     }
 
-    // 新增方法：收集所有RendererComponent（包括子对象）
+    // 收集所有RendererComponent
     public List<RendererComponent> collectAllRenderers()
     {
         List<RendererComponent> allRenderers = new ArrayList<>();
@@ -270,7 +270,7 @@ public class GameObject
         // 先收集当前对象的渲染组件
         for (Component component : components)
         {
-            if (component.isEnabled() && component instanceof RendererComponent)
+            if (component.isEnabled() &&component.isStarted() && component instanceof RendererComponent)
             {
                 allRenderers.add((RendererComponent) component);
             }
