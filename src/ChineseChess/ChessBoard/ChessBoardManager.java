@@ -259,9 +259,7 @@ public class ChessBoardManager extends Component
                     {
                         selectedChessPiece.getComponent(PieceMovementManager.class).moveTo(pointedPlace[0], pointedPlace[1]);
                         isJustMoved = true;
-                        checkIfGameOver();
-                        updateAllPlaces();
-                        checkIfInCheck();
+    
                         switchTurn();
                     }
                     // 吃子逻辑
@@ -269,9 +267,7 @@ public class ChessBoardManager extends Component
                     {
                         selectedChessPiece.getComponent(PieceMovementManager.class).eat(pointedPlace[0], pointedPlace[1]);
                         isJustEaten = true;
-                        checkIfGameOver();
-                        updateAllPlaces();
-                        checkIfInCheck();
+                        // 注意：游戏结束和将军检查现在在吃子完成后进行（在PieceMovementManager.onEat()中）
                         switchTurn();
                     }
                     // 切换
@@ -310,15 +306,17 @@ public class ChessBoardManager extends Component
 
     public void updateAllPlaces()
     {
-        ChessPiece[][] allPieces = deepCopy(chessPieces);
-        for(ChessPiece[] line : allPieces)
+        for(ChessPiece[] line : chessPieces)
         {
-            for(ChessPiece p :line)
+            for(ChessPiece p : line)
             {
-                if(p==null) continue;
+                if(p == null) continue;
 
                 ChessPieceManager pManager = p.getComponent(ChessPieceManager.class);
-                pManager.updateValidPlaces();
+                if(pManager != null)
+                {
+                    pManager.updateValidPlaces();
+                }
             }
         }
     }
@@ -351,21 +349,36 @@ public class ChessBoardManager extends Component
      */
     public void checkIfInCheck()
     {
+        // 用新的棋盘状态进行检查
+        updateAllPlaces();
         checkIfBlackInCheck();
         checkIfRedInCheck();
     }
     private void checkIfBlackInCheck()
     {
         ChessPieceManager blackGeneral = getPieceManagerByName("BLACK_GENERAL_0");
-        for(ChessPiece[] lines:chessPieces)
+        if (blackGeneral == null)
+        {
+            isBlackInCheck = false;
+            return;
+        }
+        
+        int blackGeneralX = blackGeneral.getCoordX();
+        int blackGeneralY = blackGeneral.getCoordY();
+        
+        ChessPiece[][] currentPieces = deepCopy(chessPieces);
+        for(ChessPiece[] lines: currentPieces)
         {
             for (ChessPiece piece : lines)
             {
                 if (piece == null) continue;
-                if (blackGeneral == null) return;
-                for (int[] eatablePlace : piece.getComponent(ChessPieceManager.class).getEatablePlaces())
+                ChessPieceManager pieceManager = piece.getComponent(ChessPieceManager.class);
+                // 检查红方棋子是否能攻击到黑方将
+                if (pieceManager.getSide() != Side.RED) continue;
+                
+                for (int[] eatablePlace : pieceManager.getEatablePlaces())
                 {
-                    if (eatablePlace[0] == blackGeneral.getCoordX() && eatablePlace[1] == blackGeneral.getCoordY())
+                    if (eatablePlace != null && eatablePlace[0] == blackGeneralX && eatablePlace[1] == blackGeneralY)
                     {
                         isBlackInCheck = true;
                         return;
@@ -378,15 +391,29 @@ public class ChessBoardManager extends Component
     private void checkIfRedInCheck()
     {
         ChessPieceManager redGeneral = getPieceManagerByName("RED_GENERAL_0");
-        for(ChessPiece[] lines:chessPieces)
+        if (redGeneral == null)
+        {
+            isRedInCheck = false;
+            return;
+        }
+        
+        int redGeneralX = redGeneral.getCoordX();
+        int redGeneralY = redGeneral.getCoordY();
+        
+        // 使用深拷贝避免在遍历时数组被修改
+        ChessPiece[][] currentPieces = deepCopy(chessPieces);
+        for(ChessPiece[] lines: currentPieces)
         {
             for(ChessPiece piece:lines)
             {
                 if(piece==null) continue;
-                if(redGeneral==null) return;
-                for(int[] eatablePlace: piece.getComponent(ChessPieceManager.class).getEatablePlaces())
+                ChessPieceManager pieceManager = piece.getComponent(ChessPieceManager.class);
+                // 检查黑方棋子是否能攻击到红方将
+                if (pieceManager.getSide() != Side.BLACK) continue;
+                
+                for(int[] eatablePlace: pieceManager.getEatablePlaces())
                 {
-                    if (eatablePlace[0] == redGeneral.getCoordX() && eatablePlace[1] == redGeneral.getCoordY())
+                    if (eatablePlace != null && eatablePlace[0] == redGeneralX && eatablePlace[1] == redGeneralY)
                     {
                         isRedInCheck = true;
                         return;

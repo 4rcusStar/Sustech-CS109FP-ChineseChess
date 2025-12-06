@@ -14,6 +14,15 @@ public class PieceMovementManager extends Component
     ChessBoardManager chessBoardManager;
 
     ChessPiece pendingEat =null;
+    //
+    private enum EatState { NONE, APPROACH, HIT, FINISH }
+    private EatState eatState = EatState.NONE;
+    private float hitX, hitY;
+    private float finalX, finalY;
+    private float victimBaseX, victimBaseY;
+    private Transform pendingEatTransform;
+    private SpriteRenderer pendingEatSprite;
+    private double hitTimer = 0;//吃子动画
 
     @Override
     public void onAwake()
@@ -31,6 +40,17 @@ public class PieceMovementManager extends Component
     }
 
     /**
+     * 逻辑上更新棋盘数据
+     */
+    private void updateBoardForMove(int x,int y)
+    {
+        chessBoardManager.setPieceAt(null,chessPieceManager.getCoordX(),chessPieceManager.getCoordY());
+        chessPieceManager.setCoord(x,y);
+        chessBoardManager.setPieceAt((ChessPiece) this.getGameObject(),x,y);
+        chessPieceManager.updateValidPlaces();
+    }
+
+    /**
      * 从当前位置移动到ij
      * @param x 棋盘坐标x
      * @param y 棋盘坐标y
@@ -41,10 +61,10 @@ public class PieceMovementManager extends Component
         float[] tPos = ChessBoardManager.coordToTransformPos(x,y);
         //通知棋盘和棋子更新数据,移动
         chessBoardManager.setPieceAt(null,chessPieceManager.getCoordX(),chessPieceManager.getCoordY());
+        // 保存目标位置，在移动完成后更新
+        pendingMoveX = x;
+        pendingMoveY = y;
         transform.moveTo(tPos[0],tPos[1],velocity);
-        chessPieceManager.setCoord(x,y);
-        chessBoardManager.setPieceAt((ChessPiece) this.getGameObject(),x,y);
-        chessPieceManager.updateValidPlaces();
     }
 
     public void moveTo(int x,int y)
@@ -55,7 +75,22 @@ public class PieceMovementManager extends Component
     public void eat(int x,int y)
     {
         pendingEat = chessBoardManager.getChessPieceAt(x, y);
-        //吃子时永远在其他棋子上层显示
+        if(pendingEat == null)
+            return;
+
+        pendingEatTransform = pendingEat.getComponent(Transform.class);
+        pendingEatSprite = pendingEat.getComponent(SpriteRenderer.class);
+        if(pendingEatTransform != null)
+        {
+            victimBaseX = pendingEatTransform.getX();
+            victimBaseY = pendingEatTransform.getY();
+        }
+        if(pendingEatSprite != null)
+        {
+            pendingEatSprite.setOpacity(1.0);
+        }
+
+        // 吃子时永远在其他棋子上层显示
         spriteRenderer.setRenderPriority(1);
         moveTo(x,y);
     }
@@ -71,13 +106,40 @@ public class PieceMovementManager extends Component
     }
 
     boolean moveStarted = false;
+    private int pendingMoveX = -1;
+    private int pendingMoveY = -1;
     @Override
     public void update()
     {
-        if(pendingEat==null)
-            return;
-        if(!transform.isMoving())
+        // 处理移动完成后的棋盘状态更新
+        if (pendingMoveX >= 0 && pendingMoveY >= 0 && !transform.isMoving())
         {
+            // 移动完成，更新棋盘状态
+            chessPieceManager.setCoord(pendingMoveX, pendingMoveY);
+            chessBoardManager.setPieceAt((ChessPiece) this.getGameObject(), pendingMoveX, pendingMoveY);
+            chessPieceManager.updateValidPlaces();
+            
+            boolean isEating = (pendingEat != null);
+            
+            pendingMoveX = -1;
+            pendingMoveY = -1;
+            
+            // 如果不是吃子，移动完成后立即检查
+            if (!isEating)
+            {
+                // 更新所有棋子的合法位置
+                chessBoardManager.updateAllPlaces();
+                
+                // 移动完成后检查游戏结束和将军状态
+                chessBoardManager.checkIfGameOver();
+                chessBoardManager.checkIfInCheck();
+            }
+        }
+        
+        // 处理吃子逻辑（在移动完成后，确保位置已更新）
+        if(pendingEat != null && !transform.isMoving() && pendingMoveX == -1 && pendingMoveY == -1)
+        {
+            // 确保吃子棋子的位置已经更新到新位置（pendingMoveX 和 pendingMoveY 已经被重置）
             onEat();
             spriteRenderer.setRenderPriority(0);
         }
@@ -88,8 +150,37 @@ public class PieceMovementManager extends Component
      */
     private void onEat()
     {
+        // 在销毁前，先清除棋盘上被吃棋子的位置
+        ChessPieceManager eatenPieceManager = pendingEat.getComponent(ChessPieceManager.class);
+        if (eatenPieceManager != null)
+        {
+            chessBoardManager.setPieceAt(null, eatenPieceManager.getCoordX(), eatenPieceManager.getCoordY());
+        }
+        
         pendingEat.getComponent(SpriteRenderer.class).setRenderPriority(-1);
         pendingEat.destroy();
         pendingEat = null;
+        
+        // 确保棋子位置正确更新
+        int currentX = chessPieceManager.getCoordX();
+        int currentY = chessPieceManager.getCoordY();
+        ChessPiece currentPiece = chessBoardManager.getChessPieceAt(currentX, currentY);
+        if (currentPiece != (ChessPiece) this.getGameObject())
+        {
+            // 如果位置不正确，重新设置
+            chessBoardManager.setPieceAt((ChessPiece) this.getGameObject(), currentX, currentY);
+        }
+        
+        // 吃子完成后，更新所有棋子的合法位置
+        chessBoardManager.updateAllPlaces();
+        
+        // 检查游戏结束（在棋子被销毁后）
+        chessBoardManager.checkIfGameOver();
+        
+        // 检查将军状态（checkIfInCheck 内部会调用 updateAllPlaces，但我们已经更新过了）
+        // 为了避免重复更新，我们创建一个不更新位置的检查方法
+        // 但为了简单，我们直接调用 checkIfInCheck，它内部会再次调用 updateAllPlaces
+        // 这虽然有点冗余，但不会导致死锁，因为 updateAllPlaces 只是遍历和更新，不会递归调用
+        chessBoardManager.checkIfInCheck();
     }
 }

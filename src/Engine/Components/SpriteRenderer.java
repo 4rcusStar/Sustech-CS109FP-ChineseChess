@@ -12,6 +12,7 @@ public class SpriteRenderer extends RendererComponent
     private float pivotX = 0, pivotY = 0;
     private float scaleX = 1;
     private float scaleY = 1;
+    private double opacity = 1.0;
 
     /**
      * 指定sprite宽高的创建
@@ -86,6 +87,20 @@ public class SpriteRenderer extends RendererComponent
     }
 
     /**
+     * 设置透明度
+     * @param opacity 透明度值，范围 0.0 到 1.0
+     */
+    public void setOpacity(double opacity)
+    {
+        this.opacity = Math.max(0.0, Math.min(1.0, opacity));
+    }
+
+    public double getOpacity()
+    {
+        return opacity;
+    }
+
+    /**
      * 渲染图标，若图标确实，则显示为紫色
      *
      * @param gc GraphicsContext画笔
@@ -93,6 +108,11 @@ public class SpriteRenderer extends RendererComponent
     public void render(GraphicsContext gc)
     {
         Transform t = getGameObject().getComponent(Transform.class);
+        
+        // 保存当前全局透明度
+        double originalGlobalAlpha = gc.getGlobalAlpha();
+        gc.setGlobalAlpha(opacity);
+        
         if (sprite == null)
         {
             gc.setFill(Color.color(1, 0, 1));
@@ -101,6 +121,8 @@ public class SpriteRenderer extends RendererComponent
         {
             gc.drawImage(sprite, t.getX()+pivotX, t.getY()+pivotY, width*scaleX, height*scaleY);
         }
+        
+        // 恢复原始全局透明度
+        gc.setGlobalAlpha(originalGlobalAlpha);
     }
-
 }

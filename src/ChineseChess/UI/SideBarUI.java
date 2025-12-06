@@ -9,5 +9,6 @@ public class SideBarUI extends GameObject
         super("SideBarUI",800,0);
         addComponent(new CurrentTurn());
         addComponent(new WinningStatus());
+        addComponent(new RestartButton());
     }
 }

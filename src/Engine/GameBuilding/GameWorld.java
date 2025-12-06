@@ -23,13 +23,37 @@ public class GameWorld
     public void onEnter()
     {
         //如果此时场景还没有搭建，则搭建场景
-        if(root.getChildren().isEmpty()&&gameWorldConstructor!=null)
-            gameWorldConstructor.construct(root);
+        if(root != null && gameWorldConstructor != null)
+        {
+            // 如果场景还没有搭建，则搭建场景
+            if(root.getChildren().isEmpty())
+            {
+                System.out.println("GameWorld.onEnter: Constructing scene (children empty)...");
+                gameWorldConstructor.construct(root);
+                root.applyPendingRelation();
+                System.out.println("GameWorld.onEnter: Scene constructed. Children count: " + root.getChildren().size());
+            }
+            else
+            {
+                System.out.println("GameWorld.onEnter: Children not empty, applying pending relations. Children count: " + root.getChildren().size());
+                root.applyPendingRelation();
+            }
+        }
+        else
+        {
+            System.out.println("GameWorld.onEnter: root or gameWorldConstructor is null!");
+        }
     }
 
     public void onExit()
     {
-        
+        // 把子对象都清掉，这样下次进来的时候就能重新构造了
+        if(root != null)
+        {
+            root.applyPendingRelation();
+            // 注意：root 本身不动，只清它的子对象
+            root.getChildren().clear();
+        }
     }
 
     public GameObject getRoot()

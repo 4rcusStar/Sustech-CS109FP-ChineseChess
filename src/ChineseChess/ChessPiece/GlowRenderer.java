@@ -11,7 +11,22 @@ public class GlowRenderer extends RendererComponent
     private ChessPieceManager piece;
     private ChessBoardManager board;
     private Transform transform;
+    private double r = 0;
+    private double g = 0.867;
+    private double b = 1;
 
+    /**
+     * 设置发光的颜色
+     * @param r
+     * @param g
+     * @param b
+     */
+    public void setColor(double r, double g, double b)
+    {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+    }
     @Override
     public void onAwake()
     {
@@ -38,7 +53,7 @@ public class GlowRenderer extends RendererComponent
         double t = (Math.sin(System.currentTimeMillis() / 300.0) + 1) * 0.5;
         double alpha = 0.6 * t;
 
-        Color glow = new Color(0, 0.867, 1, alpha);
+        Color glow = new Color(r, g, b, alpha);
         gc.setFill(glow);
         gc.fillOval(x, y, radius, radius);
 
