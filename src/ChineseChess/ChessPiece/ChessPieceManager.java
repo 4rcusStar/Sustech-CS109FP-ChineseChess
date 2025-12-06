@@ -612,12 +612,14 @@ public class ChessPieceManager extends Component
                         canMove(coordX + 1, coordY);
                     }
                 }
-                movablePlaces.removeIf(this::generalJudge_1);
+                // 不再移除王见王的位置，改为在移动时检查
+                // movablePlaces.removeIf(this::generalJudge_1);
             }
         }
         if (!type.equals(PieceType.GENERAL))
         {
-            movablePlaces.removeIf(this::generalJudge_2);
+            // 不再移除王见王的位置，改为在移动时检查
+            // movablePlaces.removeIf(this::generalJudge_2);
         }
     }
 

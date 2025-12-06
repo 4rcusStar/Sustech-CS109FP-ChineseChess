@@ -1,6 +1,7 @@
 package ChineseChess.ChessBoard;
 
 import ChineseChess.ChessPiece.*;
+import ChineseChess.UI.InvalidMoveToast;
 import Engine.Components.Component;
 import Engine.Components.PointerDetector;
 import Engine.Components.SpriteRenderer;
@@ -55,6 +56,8 @@ public class ChessBoardManager extends Component
 
     private boolean isGameOver = false;
     Side winnerSide = null;
+    
+    private InvalidMoveToast invalidMoveToast;
 
     /**
      * 返回胜利方，如果游戏没有结束，返回null
@@ -112,6 +115,13 @@ public class ChessBoardManager extends Component
     {
         spriteRenderer.setSprite(sprite);
         spriteRenderer.setSize(800, 800);
+        
+        // 创建无效移动提示浮框
+        Engine.Core.GameObject toastObj = new Engine.Core.GameObject("InvalidMoveToast", 0, 0);
+        invalidMoveToast = new InvalidMoveToast();
+        toastObj.addComponent(invalidMoveToast);
+        getGameObject().addChild(toastObj);
+        System.out.println("InvalidMoveToast created and added to ChessBoard");
         //构造格点
         for (int i = 0; i < 9; i++)
         {
@@ -257,18 +267,63 @@ public class ChessBoardManager extends Component
                     // 走子
                     if (pointedPlace != null && movablePlaces.contains(pointedPlace))
                     {
-                        selectedChessPiece.getComponent(PieceMovementManager.class).moveTo(pointedPlace[0], pointedPlace[1]);
-                        isJustMoved = true;
-    
-                        switchTurn();
+                        // 先检查是否会王见王
+                        if (wouldFaceGenerals(selectedChessPiece, pointedPlace[0], pointedPlace[1]))
+                        {
+                            // 会王见王，显示提示并阻止移动
+                            System.out.println("Invalid move detected: would face generals");
+                            if (invalidMoveToast != null)
+                            {
+                                invalidMoveToast.show();
+                            }
+                        }
+                        // 再检查是否会送将
+                        else if (wouldExposeGeneral(selectedChessPiece, pointedPlace[0], pointedPlace[1], false))
+                        {
+                            // 会送将，显示提示并阻止移动
+                            System.out.println("Invalid move detected: would expose general");
+                            if (invalidMoveToast != null)
+                            {
+                                invalidMoveToast.show();
+                            }
+                        }
+                        else
+                        {
+                            selectedChessPiece.getComponent(PieceMovementManager.class).moveTo(pointedPlace[0], pointedPlace[1]);
+                            isJustMoved = true;
+                            switchTurn();
+                        }
                     }
                     // 吃子逻辑
                     else if (pointedPlace != null && eatablePlaces.contains(pointedPlace))
                     {
-                        selectedChessPiece.getComponent(PieceMovementManager.class).eat(pointedPlace[0], pointedPlace[1]);
-                        isJustEaten = true;
-                        // 注意：游戏结束和将军检查现在在吃子完成后进行（在PieceMovementManager.onEat()中）
-                        switchTurn();
+                        // 先检查是否会王见王
+                        if (wouldFaceGenerals(selectedChessPiece, pointedPlace[0], pointedPlace[1]))
+                        {
+                            // 会王见王，显示提示并阻止移动
+                            System.out.println("Invalid eat detected: would face generals");
+                            if (invalidMoveToast != null)
+                            {
+                                invalidMoveToast.show();
+                            }
+                        }
+                        // 再检查是否会送将
+                        else if (wouldExposeGeneral(selectedChessPiece, pointedPlace[0], pointedPlace[1], true))
+                        {
+                            // 会送将，显示提示并阻止移动
+                            System.out.println("Invalid eat detected: would expose general");
+                            if (invalidMoveToast != null)
+                            {
+                                invalidMoveToast.show();
+                            }
+                        }
+                        else
+                        {
+                            selectedChessPiece.getComponent(PieceMovementManager.class).eat(pointedPlace[0], pointedPlace[1]);
+                            isJustEaten = true;
+                            // 注意：游戏结束和将军检查现在在吃子完成后进行（在PieceMovementManager.onEat()中）
+                            switchTurn();
+                        }
                     }
                     // 切换
                     else if (pointedPiece != null)
@@ -424,6 +479,191 @@ public class ChessBoardManager extends Component
         isRedInCheck = false;
     }
 
+    /**
+     * 检查移动后是否会王见王（两个将面对面）
+     * @param piece 要移动的棋子
+     * @param targetX 目标X坐标
+     * @param targetY 目标Y坐标
+     * @return true表示会王见王，false表示不会
+     */
+    private boolean wouldFaceGenerals(ChessPiece piece, int targetX, int targetY)
+    {
+        ChessPieceManager pieceManager = piece.getComponent(ChessPieceManager.class);
+        if (pieceManager == null) return false;
+        
+        ChessPieceManager redGeneral = getPieceManagerByName("RED_GENERAL_0");
+        ChessPieceManager blackGeneral = getPieceManagerByName("BLACK_GENERAL_0");
+        if (redGeneral == null || blackGeneral == null) return false;
+        
+        int originalX = pieceManager.getCoordX();
+        int originalY = pieceManager.getCoordY();
+        
+        // 保存原始状态
+        ChessPiece originalPieceAtTarget = chessPieces[targetX][targetY];
+        
+        // 模拟移动：临时更新棋盘状态
+        chessPieces[originalX][originalY] = null;
+        chessPieces[targetX][targetY] = piece;
+        pieceManager.setCoord(targetX, targetY);
+        
+        // 获取移动后的将的位置
+        int redGeneralX = redGeneral.getCoordX();
+        int redGeneralY = redGeneral.getCoordY();
+        int blackGeneralX = blackGeneral.getCoordX();
+        int blackGeneralY = blackGeneral.getCoordY();
+        
+        boolean wouldFace = false;
+        
+        // 检查两个将是否在同一列（X坐标相同）
+        if (redGeneralX == blackGeneralX)
+        {
+            // 检查两个将之间是否有其他棋子
+            int minY = Math.min(redGeneralY, blackGeneralY);
+            int maxY = Math.max(redGeneralY, blackGeneralY);
+            boolean hasPieceBetween = false;
+            
+            for (int y = minY + 1; y < maxY; y++)
+            {
+                if (chessPieces[redGeneralX][y] != null)
+                {
+                    hasPieceBetween = true;
+                    break;
+                }
+            }
+            
+            // 如果两个将之间没有其他棋子，则王见王
+            if (!hasPieceBetween)
+            {
+                wouldFace = true;
+            }
+        }
+        
+        // 恢复原始状态
+        chessPieces[originalX][originalY] = piece;
+        chessPieces[targetX][targetY] = originalPieceAtTarget;
+        pieceManager.setCoord(originalX, originalY);
+        
+        return wouldFace;
+    }
+    
+    /**
+     * 检查移动后是否会送将（即移动后，对方是否能吃掉我方的将）
+     * @param piece 要移动的棋子
+     * @param targetX 目标X坐标
+     * @param targetY 目标Y坐标
+     * @param isEating 是否是吃子
+     * @return true表示会送将，false表示不会
+     */
+    private boolean wouldExposeGeneral(ChessPiece piece, int targetX, int targetY, boolean isEating)
+    {
+        ChessPieceManager pieceManager = piece.getComponent(ChessPieceManager.class);
+        if (pieceManager == null) return false;
+        
+        Side movingSide = pieceManager.getSide();
+        int originalX = pieceManager.getCoordX();
+        int originalY = pieceManager.getCoordY();
+        
+        // 保存原始状态
+        ChessPiece originalPieceAtTarget = chessPieces[targetX][targetY];
+        
+        // 模拟移动：临时更新棋盘状态
+        chessPieces[originalX][originalY] = null;
+        chessPieces[targetX][targetY] = piece;
+        pieceManager.setCoord(targetX, targetY);
+        
+        // 如果是吃子，被吃的棋子已经在target位置，模拟移动时会覆盖它
+        
+        // 更新所有棋子的合法位置
+        updateAllPlaces();
+        
+        // 检查移动后，对方是否能吃掉我方的将
+        boolean wouldExpose = false;
+        if (movingSide == Side.RED)
+        {
+            // 检查黑方是否能吃掉红方将
+            wouldExpose = checkIfRedInCheckAfterMove();
+        }
+        else
+        {
+            // 检查红方是否能吃掉黑方将
+            wouldExpose = checkIfBlackInCheckAfterMove();
+        }
+        
+        // 恢复原始状态
+        chessPieces[originalX][originalY] = piece;
+        chessPieces[targetX][targetY] = originalPieceAtTarget;
+        pieceManager.setCoord(originalX, originalY);
+        
+        // 重新更新所有棋子的合法位置
+        updateAllPlaces();
+        
+        return wouldExpose;
+    }
+    
+    /**
+     * 检查移动后红方是否会被将
+     */
+    private boolean checkIfRedInCheckAfterMove()
+    {
+        ChessPieceManager redGeneral = getPieceManagerByName("RED_GENERAL_0");
+        if (redGeneral == null) return false;
+        
+        int redGeneralX = redGeneral.getCoordX();
+        int redGeneralY = redGeneral.getCoordY();
+        
+        ChessPiece[][] currentPieces = deepCopy(chessPieces);
+        for(ChessPiece[] lines: currentPieces)
+        {
+            for(ChessPiece p: lines)
+            {
+                if(p == null) continue;
+                ChessPieceManager pManager = p.getComponent(ChessPieceManager.class);
+                if (pManager == null || pManager.getSide() != Side.BLACK) continue;
+                
+                for(int[] eatablePlace: pManager.getEatablePlaces())
+                {
+                    if (eatablePlace != null && eatablePlace[0] == redGeneralX && eatablePlace[1] == redGeneralY)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * 检查移动后黑方是否会被将
+     */
+    private boolean checkIfBlackInCheckAfterMove()
+    {
+        ChessPieceManager blackGeneral = getPieceManagerByName("BLACK_GENERAL_0");
+        if (blackGeneral == null) return false;
+        
+        int blackGeneralX = blackGeneral.getCoordX();
+        int blackGeneralY = blackGeneral.getCoordY();
+        
+        ChessPiece[][] currentPieces = deepCopy(chessPieces);
+        for(ChessPiece[] lines: currentPieces)
+        {
+            for(ChessPiece p: lines)
+            {
+                if(p == null) continue;
+                ChessPieceManager pManager = p.getComponent(ChessPieceManager.class);
+                if (pManager == null || pManager.getSide() != Side.RED) continue;
+                
+                for(int[] eatablePlace: pManager.getEatablePlaces())
+                {
+                    if (eatablePlace != null && eatablePlace[0] == blackGeneralX && eatablePlace[1] == blackGeneralY)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
     /**
      * 检查游戏是否结束
      */

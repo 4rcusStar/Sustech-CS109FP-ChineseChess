@@ -208,7 +208,6 @@ public class GameObject
             component.markAwaken();
         }
         //让子Object调用awake()
-        // 用副本遍历，不然在遍历的时候改列表会报错（之前被坑过）
         for(GameObject child : new ArrayList<>(children))
         {
             child.awake();
@@ -222,7 +221,6 @@ public class GameObject
             component.markStarted();
         }
         //子O调用
-        // 同样用副本，防止并发修改异常
         for(GameObject child : new ArrayList<>(children))
         {
             child.start();
@@ -239,7 +237,6 @@ public class GameObject
                 component.update();
             }
         }
-        // 遍历子对象的时候用副本，这样即使列表被改了也不会崩
         for(GameObject child : new ArrayList<>(children))
         {
             child.update();

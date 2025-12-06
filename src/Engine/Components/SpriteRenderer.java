@@ -88,7 +88,7 @@ public class SpriteRenderer extends RendererComponent
 
     /**
      * 设置透明度
-     * @param opacity 透明度值，范围 0.0 到 1.0
+     * @param opacity 透明度值，范围 0-1
      */
     public void setOpacity(double opacity)
     {
