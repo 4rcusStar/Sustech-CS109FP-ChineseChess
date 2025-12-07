@@ -5,6 +5,7 @@ import ChineseChess.ChessPiece.ChessPiece;
 import ChineseChess.ChessPiece.PieceType;
 import ChineseChess.ChessPiece.Side;
 import ChineseChess.UI.SideBarUI;
+import ChineseChess.UI.TurnIndicator;
 import Engine.Core.GameObject;
 import Engine.GameBuilding.GameWorldConstructor;
 
@@ -19,6 +20,11 @@ public class ChessWorldConstructor extends GameWorldConstructor
 
         ChessBoard chessBoard = new ChessBoard("ChessBoard");
         root.addChild(chessBoard);
+        
+        // 添加回合指示器
+        GameObject indicatorObj = new GameObject("TurnIndicator", 0, 0);
+        indicatorObj.addComponent(new TurnIndicator());
+        root.addChild(indicatorObj);
 
         // 红方棋子
         ChessPiece redGeneral = new ChessPiece(Side.RED, PieceType.GENERAL, 0);

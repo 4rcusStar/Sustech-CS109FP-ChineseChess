@@ -70,6 +70,22 @@ public class ChessBoardManager extends Component
         return winnerSide;
     }
 
+    /**
+     * 投降方法：立即结束游戏，设置获胜方为对方
+     * @param winnerSide 获胜方（对方）
+     */
+    public void surrender(Side winnerSide)
+    {
+        if (isGameOver)
+        {
+            return; // 游戏已经结束，不处理
+        }
+        
+        isGameOver = true;
+        this.winnerSide = winnerSide;
+        System.out.printf("Game Over (Surrender), Winner: %s\n", winnerSide);
+    }
+
     public <T> T[][] deepCopy(T[][] original)
     {
         if (original == null) return null;

@@ -1,0 +1,20 @@
+[33mda62ebd[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature/javafx-renderer[m[33m)[m feat(game)
+[33m2242111[m feat(game)
+[33m9d65ecf[m feat(game)
+[33m2232ffe[m feat(ui): 添加用户登录界面与场景切换修复
+[33mbb3837e[m feature(game) -创建存档系统，通过调用UserManager单例的各种方法实现存档
+[33m1e28dea[m feature(engine)-完善场景系统 -给游戏添加基本的主菜单
+[33m5893eb9[m feat(engine) -扩展GameWorld添加场景生命周期方法onEnter/onExit -新增GameWorldManager场景管理器实现场景切换功能 -修改RenderEngine和GameEngine支持场景注册和注销
+[33mee12e2b[m fix(game) -修复将军状态解除时仍然显示被将军的问题 -增加WinningStatus UI组件
+[33m9e326e5[m feature(UI) -增加当前回合显示、被将军显示、游戏结束赢家显示
+[33m6322e11[m feature(game)增加基本的UI控件
+[33mcb09e97[m fix(game)-修复多处判断逻辑Bug
+[33m5a2b6e2[m 是否被将军和game over中关于将帅被吃的判断
+[33m33d8ea2[m feat(game): -增加判断将军和游戏结束的待完善空体
+[33me7de3b6[m feat(game): -增加判断将军和游戏结束的待完善空体
+[33maf6e4f6[m feat(game): -增加判断将军和游戏结束的待完善空体
+[33m6d0e0b6[m feat(game): -增加了回合机制 -增加了回合可操纵棋子的动效
+[33ma5ae21b[m feat(game&engine): -添加渲染层级系统 -优化移动方式为EaseOut -增加可吃子标记
+[33md145729[m 加入了吃子图像渲染
+[33m2195d97[m fix(game): -重构象移动合法判断 -修复塞象眼能移动的问题 -修复将被吃引发异常
+[33meb2f264[m 棋子移动合法性的判断
