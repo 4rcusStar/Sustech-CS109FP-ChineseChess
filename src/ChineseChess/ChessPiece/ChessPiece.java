@@ -12,6 +12,7 @@ public class ChessPiece extends GameObject
         super(side+"_"+type+"_"+pieceIndex);
         addComponent(new PointerDetector(80,80,1));
         addComponent(new SpriteRenderer());
+        addComponent(new PerspectiveRenderer());
         addComponent(new ChessPieceManager(side,type,pieceIndex));
         addComponent(new PieceMovementManager());
         addComponent(new GlowRenderer());

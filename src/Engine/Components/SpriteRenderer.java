@@ -100,6 +100,11 @@ public class SpriteRenderer extends RendererComponent
         return opacity;
     }
 
+    public Image getSprite()
+    {
+        return sprite;
+    }
+
     /**
      * 渲染图标，若图标确实，则显示为紫色
      *
