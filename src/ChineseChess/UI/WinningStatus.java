@@ -33,10 +33,15 @@ public class WinningStatus extends RendererComponent
         if(chessBoard.isGameOver())
         {
             Side winnerSide = chessBoard.getWinnerSide();
+            String reason = chessBoard.getEndReason();
             gc.setFill(Color.BLACK);
             gc.setFont(Font.font(FONT_FAMILY, NORMAL_FONT_SIZE));
             gc.fillText("Game Over", originX+TEXT_OFFSET_X, originY+TEXT_OFFSET_Y);
             gc.fillText("Winner:"+winnerSide, originX+TEXT_OFFSET_X, originY+TEXT_OFFSET_Y+20);
+            if (reason != null)
+            {
+                gc.fillText(reason, originX+TEXT_OFFSET_X, originY+TEXT_OFFSET_Y+40);
+            }
         }
     }
 }

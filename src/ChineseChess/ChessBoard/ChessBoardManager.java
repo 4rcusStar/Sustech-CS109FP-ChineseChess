@@ -57,6 +57,7 @@ public class ChessBoardManager extends Component
 
     private boolean isGameOver = false;
     Side winnerSide = null;
+    private String endReason = null;
     
     private InvalidMoveToast invalidMoveToast;
 
@@ -69,6 +70,11 @@ public class ChessBoardManager extends Component
         if(!isGameOver)
             return null;
         return winnerSide;
+    }
+
+    public String getEndReason()
+    {
+        return endReason;
     }
 
     /**
@@ -84,6 +90,7 @@ public class ChessBoardManager extends Component
         
         isGameOver = true;
         this.winnerSide = winnerSide;
+        this.endReason = "Surrender";
         System.out.printf("Game Over (Surrender), Winner: %s\n", winnerSide);
     }
 
@@ -148,7 +155,9 @@ public class ChessBoardManager extends Component
             }
         }
 
-        
+        // 开局就检查一次（极端局面无合法步）
+        checkIfInCheck();
+        evaluateCurrentSideLegalMoves();
     }
 
     /**
@@ -268,7 +277,7 @@ public class ChessBoardManager extends Component
             else
             {
                 ChessPieceManager selectedManager = selectedChessPiece.getComponent(ChessPieceManager.class);
-                // 如果当前选中的棋子不属于当前回合，则先按“无选中”重新处理本次点击
+                // 如果当前选中的棋子不属于当前回合，则先按无选中重新处理本次点击
                 if (selectedManager == null || selectedManager.getSide() != currentSide)
                 {
                     selectedChessPiece = null;
@@ -294,8 +303,7 @@ public class ChessBoardManager extends Component
                         // 先检查是否会王见王
                         if (wouldFaceGenerals(selectedChessPiece, pointedPlace[0], pointedPlace[1]))
                         {
-                            // 会王见王，显示提示并阻止移动
-                            System.out.println("Invalid move detected: would face generals");
+                            // 会王见王阻止移动
                             if (invalidMoveToast != null)
                             {
                                 invalidMoveToast.show();
@@ -304,8 +312,7 @@ public class ChessBoardManager extends Component
                         // 再检查是否会送将
                         else if (wouldExposeGeneral(selectedChessPiece, pointedPlace[0], pointedPlace[1], false))
                         {
-                            // 会送将，显示提示并阻止移动
-                            System.out.println("Invalid move detected: would expose general");
+                            // 会送将，阻止移动
                             if (invalidMoveToast != null)
                             {
                                 invalidMoveToast.show();
@@ -324,8 +331,6 @@ public class ChessBoardManager extends Component
                         // 先检查是否会王见王
                         if (wouldFaceGenerals(selectedChessPiece, pointedPlace[0], pointedPlace[1]))
                         {
-                            // 会王见王，显示提示并阻止移动
-                            System.out.println("Invalid eat detected: would face generals");
                             if (invalidMoveToast != null)
                             {
                                 invalidMoveToast.show();
@@ -345,7 +350,6 @@ public class ChessBoardManager extends Component
                         {
                             selectedChessPiece.getComponent(PieceMovementManager.class).eat(pointedPlace[0], pointedPlace[1]);
                             isJustEaten = true;
-                            // 注意：游戏结束和将军检查现在在吃子完成后进行（在PieceMovementManager.onEat()中）
                             switchTurn();
                         }
                     }
@@ -422,6 +426,8 @@ public class ChessBoardManager extends Component
         turnNumber++;
         System.out.println(isBlackInCheck);
         System.out.println(isRedInCheck);
+        checkIfInCheck();
+        evaluateCurrentSideLegalMoves();
     }
 
     /**
@@ -715,8 +721,75 @@ public class ChessBoardManager extends Component
         if(isGameOver)
         {
             winnerSide = isBlackGeneralExist?Side.BLACK:Side.RED;
+            endReason = "General Captured";
             System.out.printf("Game Over,Winner:%s",winnerSide);
         }
+    }
+
+    /**
+     * 回合开始时检查当前阵营是否有任何合法步；若无，则根据是否被将判定绝杀或困毙
+     */
+    private void evaluateCurrentSideLegalMoves()
+    {
+        if (isGameOver)
+        {
+            return;
+        }
+
+        // 确保各棋子可行步已更新
+        updateAllPlaces();
+        checkIfInCheck();
+
+        boolean hasLegalMove = false;
+        for (ChessPiece[] line : chessPieces)
+        {
+            for (ChessPiece piece : line)
+            {
+                if (piece == null) continue;
+                ChessPieceManager pm = piece.getComponent(ChessPieceManager.class);
+                if (pm == null || pm.getSide() != currentSide) continue;
+
+                List<int[]> movableSnapshot = new LinkedList<>(pm.getMovablePlaces());
+                List<int[]> eatableSnapshot = new LinkedList<>(pm.getEatablePlaces());
+
+                // 走子
+                for (int[] mv : movableSnapshot)
+                {
+                    if (mv == null) continue;
+                    if (!wouldFaceGenerals(piece, mv[0], mv[1]) && !wouldExposeGeneral(piece, mv[0], mv[1], false))
+                    {
+                        hasLegalMove = true;
+                        break;
+                    }
+                }
+                if (hasLegalMove) break;
+
+                // 吃子
+                for (int[] eat : eatableSnapshot)
+                {
+                    if (eat == null) continue;
+                    if (!wouldFaceGenerals(piece, eat[0], eat[1]) && !wouldExposeGeneral(piece, eat[0], eat[1], true))
+                    {
+                        hasLegalMove = true;
+                        break;
+                    }
+                }
+                if (hasLegalMove) break;
+            }
+            if (hasLegalMove) break;
+        }
+
+        if (hasLegalMove)
+        {
+            return;
+        }
+
+        // 无合法步：根据是否被将判定绝杀或困毙
+        boolean inCheck = (currentSide == Side.RED) ? isRedInCheck : isBlackInCheck;
+        isGameOver = true;
+        winnerSide = (currentSide == Side.RED) ? Side.BLACK : Side.RED;
+        endReason = inCheck ? "绝杀无解" : "困毙";
+        System.out.printf("Game Over (%s), Winner:%s\n", endReason, winnerSide);
     }
 
     public ChessPiece getChessPieceAt(int x, int y)
