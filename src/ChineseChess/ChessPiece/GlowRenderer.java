@@ -6,7 +6,6 @@ import Engine.Components.Transform;
 import Engine.Components.SpriteRenderer;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.image.Image;
 
 public class GlowRenderer extends RendererComponent
 {
@@ -73,29 +72,5 @@ public class GlowRenderer extends RendererComponent
         }
     }
 
-    /**
-     * 采样棋子贴图底部像素颜色，用作阴影基色
-     */
-    private Color sampleBottomPixelColor()
-    {
-        if (spriteRenderer == null)
-        {
-            return Color.color(r, g, b);
-        }
-        Image img = spriteRenderer.getSprite();
-        if (img == null || img.getPixelReader() == null)
-        {
-            return Color.color(r, g, b);
-        }
-        int px = Math.max(0, (int)(img.getWidth() / 2));
-        int py = Math.max(0, (int)(img.getHeight() - 1));
-        try
-        {
-            return img.getPixelReader().getColor(px, py);
-        }
-        catch (Exception e)
-        {
-            return Color.color(r, g, b);
-        }
-    }
+   
 }

@@ -119,7 +119,6 @@ public class PerspectiveRenderer extends RendererComponent
             {
                 // 位置比例：0 顶部，1 底部
                 float t = (float)i / (layerCount - 1);
-                // 缓出曲线，顶部更平滑避免尖顶
                 float eased = t * t * (2f - t);
 
                 float scale = TOP_SCALE + (BOTTOM_SCALE - TOP_SCALE) * eased;

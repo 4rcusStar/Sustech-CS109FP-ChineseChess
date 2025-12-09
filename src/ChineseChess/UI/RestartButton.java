@@ -28,8 +28,8 @@ public class RestartButton extends Button
         setSize(120f, 40f);
         setOffset((SIDEBAR_WIDTH / 2f) - (width / 2f), BUTTON_OFFSET_Y);
         setColors(
-            Color.rgb(100, 149, 237), // 正常颜色（矢车菊蓝）
-            Color.rgb(70, 130, 180)    // 悬停颜色（钢蓝色）
+            Color.rgb(100, 149, 237), // 正常颜色
+            Color.rgb(70, 130, 180)    // 悬停颜色
         );
         setBorderColor(Color.rgb(65, 105, 225));
         setBorderWidth(2f);

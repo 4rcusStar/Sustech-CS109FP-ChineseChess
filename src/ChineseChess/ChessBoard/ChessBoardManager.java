@@ -35,6 +35,7 @@ public class ChessBoardManager extends Component
     private boolean isMouseInChessBoard = false;
 
     private Side currentSide = Side.RED;
+    private int turnNumber = 1; // 当前回合数（红方先手为第1回合）
 
     public boolean isBlackInCheck()
     {
@@ -146,6 +147,8 @@ public class ChessBoardManager extends Component
                 allPlaces.add(new int[]{i, j});
             }
         }
+
+        
     }
 
     /**
@@ -213,6 +216,11 @@ public class ChessBoardManager extends Component
     public Side getCurrentSide()
     {
         return currentSide;
+    }
+
+    public int getTurnNumber()
+    {
+        return turnNumber;
     }
 
     public void update()
@@ -411,6 +419,7 @@ public class ChessBoardManager extends Component
     public void switchTurn()
     {
         currentSide = (currentSide == Side.RED ? Side.BLACK : Side.RED);
+        turnNumber++;
         System.out.println(isBlackInCheck);
         System.out.println(isRedInCheck);
     }
@@ -729,5 +738,7 @@ public class ChessBoardManager extends Component
     {
         return selectedChessPiece;
     }
+
+
 
 }

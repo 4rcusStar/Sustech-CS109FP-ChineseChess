@@ -13,10 +13,11 @@ import javafx.scene.paint.Color;
 public class SurrenderButton extends Button
 {
     private static final float SIDEBAR_WIDTH = 200f;
-    private static final float BUTTON_OFFSET_Y = 200f; // 放在 RestartButton 下方
+    private static final float BUTTON_OFFSET_Y = 400f; // 放在 RestartButton 下方
     
     private ChessBoardManager chessBoard;
     private boolean chessBoardInitialized = false;
+    private boolean externalColorControl = false; // 允许外部控制颜色渐变
     
     @Override
     public void onAwake()
@@ -59,19 +60,23 @@ public class SurrenderButton extends Button
         {
             setButtonEnabled(!chessBoard.isGameOver());
             
-            // 根据当前回合方动态改变边框颜色
-            Side currentSide = chessBoard.getCurrentSide();
-            if (currentSide != null)
+            // 若外部控制颜色渐变，则不在此处覆盖颜色
+            if (!externalColorControl)
             {
-                if (currentSide == Side.RED)
+                // 根据当前回合方动态改变边框颜色
+                Side currentSide = chessBoard.getCurrentSide();
+                if (currentSide != null)
                 {
-                    // 红方回合：红色边框（发光效果）
-                    setBorderColor(Color.rgb(255, 0, 0)); // 纯红色
-                }
-                else
-                {
-                    // 黑方回合：黑色边框（发光效果）
-                    setBorderColor(Color.rgb(0, 0, 0)); // 纯黑色
+                    if (currentSide == Side.RED)
+                    {
+                        // 红方回合：红色边框（发光效果）
+                        setBorderColor(Color.rgb(255, 0, 0)); // 纯红色
+                    }
+                    else
+                    {
+                        // 黑方回合：黑色边框（发光效果）
+                        setBorderColor(Color.rgb(0, 0, 0)); // 纯黑色
+                    }
                 }
             }
         }
@@ -100,6 +105,14 @@ public class SurrenderButton extends Button
                 chessBoard.surrender(winnerSide);
             }
         }
+    }
+
+    /**
+     * 允许由外部（如 CurrentTurn）驱动颜色渐变
+     */
+    public void setExternalColorControl(boolean enabled)
+    {
+        this.externalColorControl = enabled;
     }
 }
 

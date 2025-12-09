@@ -177,10 +177,6 @@ public class PieceMovementManager extends Component
         // 检查游戏结束（在棋子被销毁后）
         chessBoardManager.checkIfGameOver();
         
-        // 检查将军状态（checkIfInCheck 内部会调用 updateAllPlaces，但我们已经更新过了）
-        // 为了避免重复更新，我们创建一个不更新位置的检查方法
-        // 但为了简单，我们直接调用 checkIfInCheck，它内部会再次调用 updateAllPlaces
-        // 这虽然有点冗余，但不会导致死锁，因为 updateAllPlaces 只是遍历和更新，不会递归调用
         chessBoardManager.checkIfInCheck();
     }
 }
