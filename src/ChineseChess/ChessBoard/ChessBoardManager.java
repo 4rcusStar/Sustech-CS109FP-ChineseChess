@@ -79,7 +79,7 @@ public class ChessBoardManager extends Component
 
     /**
      * 投降方法：立即结束游戏，设置获胜方为对方
-     * @param winnerSide 获胜方（对方）
+     * @param winnerSide 获胜方
      */
     public void surrender(Side winnerSide)
     {
@@ -90,7 +90,7 @@ public class ChessBoardManager extends Component
         
         isGameOver = true;
         this.winnerSide = winnerSide;
-        this.endReason = "Surrender";
+        this.endReason =  winnerSide == Side.BLACK ? "Red Surrendered" : "Black Surrendered";
         System.out.printf("Game Over (Surrender), Winner: %s\n", winnerSide);
     }
 
@@ -154,8 +154,8 @@ public class ChessBoardManager extends Component
                 allPlaces.add(new int[]{i, j});
             }
         }
-
-        // 开局就检查一次（极端局面无合法步）
+        
+        // 开局检查一次合法步（极端残局）
         checkIfInCheck();
         evaluateCurrentSideLegalMoves();
     }
@@ -322,7 +322,6 @@ public class ChessBoardManager extends Component
                         {
                             selectedChessPiece.getComponent(PieceMovementManager.class).moveTo(pointedPlace[0], pointedPlace[1]);
                             isJustMoved = true;
-                            switchTurn();
                         }
                     }
                     // 吃子逻辑
@@ -350,7 +349,6 @@ public class ChessBoardManager extends Component
                         {
                             selectedChessPiece.getComponent(PieceMovementManager.class).eat(pointedPlace[0], pointedPlace[1]);
                             isJustEaten = true;
-                            switchTurn();
                         }
                     }
                     // 切换
@@ -424,10 +422,6 @@ public class ChessBoardManager extends Component
     {
         currentSide = (currentSide == Side.RED ? Side.BLACK : Side.RED);
         turnNumber++;
-        System.out.println(isBlackInCheck);
-        System.out.println(isRedInCheck);
-        checkIfInCheck();
-        evaluateCurrentSideLegalMoves();
     }
 
     /**
@@ -578,7 +572,7 @@ public class ChessBoardManager extends Component
     }
     
     /**
-     * 检查移动后是否会送将（即移动后，对方是否能吃掉我方的将）
+     * 检查移动后是否会送将
      * @param piece 要移动的棋子
      * @param targetX 目标X坐标
      * @param targetY 目标Y坐标
@@ -601,8 +595,6 @@ public class ChessBoardManager extends Component
         chessPieces[originalX][originalY] = null;
         chessPieces[targetX][targetY] = piece;
         pieceManager.setCoord(targetX, targetY);
-        
-        // 如果是吃子，被吃的棋子已经在target位置，模拟移动时会覆盖它
         
         // 更新所有棋子的合法位置
         updateAllPlaces();
@@ -737,10 +729,14 @@ public class ChessBoardManager extends Component
         }
 
         // 确保各棋子可行步已更新
+        rebuildBoardByManagers();
         updateAllPlaces();
         checkIfInCheck();
 
         boolean hasLegalMove = false;
+        int candidatePieces = 0;
+        int candidateMoves = 0;
+
         for (ChessPiece[] line : chessPieces)
         {
             for (ChessPiece piece : line)
@@ -748,16 +744,28 @@ public class ChessBoardManager extends Component
                 if (piece == null) continue;
                 ChessPieceManager pm = piece.getComponent(ChessPieceManager.class);
                 if (pm == null || pm.getSide() != currentSide) continue;
+                candidatePieces++;
 
+                pm.updateValidPlaces();
                 List<int[]> movableSnapshot = new LinkedList<>(pm.getMovablePlaces());
                 List<int[]> eatableSnapshot = new LinkedList<>(pm.getEatablePlaces());
+                candidateMoves += movableSnapshot.size();
+                candidateMoves += eatableSnapshot.size();
 
                 // 走子
                 for (int[] mv : movableSnapshot)
                 {
                     if (mv == null) continue;
-                    if (!wouldFaceGenerals(piece, mv[0], mv[1]) && !wouldExposeGeneral(piece, mv[0], mv[1], false))
+                    if (mv[0] == pm.getCoordX() && mv[1] == pm.getCoordY()) continue;
+                    boolean legal = isMoveLegalForSide(piece, mv[0], mv[1]);
+                    if (legal)
                     {
+                        System.out.printf("[LegalMoveFound] side=%s piece=%s move=(%d,%d)->(%d,%d) face=%s expose=%s\n",
+                                currentSide,
+                                piece.getName(),
+                                pm.getCoordX(), pm.getCoordY(),
+                                mv[0], mv[1],
+                                false, false);
                         hasLegalMove = true;
                         break;
                     }
@@ -768,8 +776,16 @@ public class ChessBoardManager extends Component
                 for (int[] eat : eatableSnapshot)
                 {
                     if (eat == null) continue;
-                    if (!wouldFaceGenerals(piece, eat[0], eat[1]) && !wouldExposeGeneral(piece, eat[0], eat[1], true))
+                    if (eat[0] == pm.getCoordX() && eat[1] == pm.getCoordY()) continue;
+                    boolean legal = isMoveLegalForSide(piece, eat[0], eat[1]);
+                    if (legal)
                     {
+                        System.out.printf("[LegalEatFound] side=%s piece=%s move=(%d,%d)->(%d,%d) face=%s expose=%s\n",
+                                currentSide,
+                                piece.getName(),
+                                pm.getCoordX(), pm.getCoordY(),
+                                eat[0], eat[1],
+                                false, false);
                         hasLegalMove = true;
                         break;
                     }
@@ -778,6 +794,9 @@ public class ChessBoardManager extends Component
             }
             if (hasLegalMove) break;
         }
+
+        System.out.printf("[LegalMoveCheck] side=%s pieces=%d moves=%d hasLegal=%s inCheck(R,B)=(%s,%s)\n",
+                currentSide, candidatePieces, candidateMoves, hasLegalMove, isRedInCheck, isBlackInCheck);
 
         if (hasLegalMove)
         {
@@ -788,7 +807,7 @@ public class ChessBoardManager extends Component
         boolean inCheck = (currentSide == Side.RED) ? isRedInCheck : isBlackInCheck;
         isGameOver = true;
         winnerSide = (currentSide == Side.RED) ? Side.BLACK : Side.RED;
-        endReason = inCheck ? "绝杀无解" : "困毙";
+        endReason = inCheck ? "绝杀,无解!" : "困毙";
         System.out.printf("Game Over (%s), Winner:%s\n", endReason, winnerSide);
     }
 
@@ -810,6 +829,100 @@ public class ChessBoardManager extends Component
     public ChessPiece getSelectedChessPiece()
     {
         return selectedChessPiece;
+    }
+
+    /**
+     * 一次移动完成后调用。检查将军、绝杀/困毙，并切换回合
+     */
+    public void onMoveResolved()
+    {
+        if (isGameOver)
+        {
+            return;
+        }
+        checkIfGameOver();
+        checkIfInCheck();
+        evaluateCurrentSideLegalMoves();
+        if (!isGameOver)
+        {
+            switchTurn();
+            // 切换后立即基于新方检查一次（防止开局无子）
+            checkIfInCheck();
+            evaluateCurrentSideLegalMoves();
+        }
+    }
+
+    /**
+     * 按各棋子管理器记录的坐标重建棋盘
+     */
+    private void rebuildBoardByManagers()
+    {
+        ChessPiece[][] rebuilt = new ChessPiece[9][10];
+        for (ChessPiece[] line : chessPieces)
+        {
+            for (ChessPiece p : line)
+            {
+                if (p == null) continue;
+                ChessPieceManager pm = p.getComponent(ChessPieceManager.class);
+                if (pm == null) continue;
+                int cx = pm.getCoordX();
+                int cy = pm.getCoordY();
+                if (cx >=0 && cx < 9 && cy >=0 && cy < 10)
+                {
+                    rebuilt[cx][cy] = p;
+                }
+            }
+        }
+        chessPieces = rebuilt;
+    }
+
+    /**
+     * 检查移动是否合法
+     * @param piece 要移动的棋子
+     * @param targetX 目标X坐标
+     * @param targetY 目标Y坐标
+     * @return true表示移动合法，false表示移动不合法
+     */
+    private boolean isMoveLegalForSide(ChessPiece piece, int targetX, int targetY)
+    {
+        ChessPieceManager pm = piece.getComponent(ChessPieceManager.class);
+        if (pm == null) return false;
+
+        Side movingSide = pm.getSide();
+        int ox = pm.getCoordX();
+        int oy = pm.getCoordY();
+
+        // 备份
+        ChessPiece originalAtTarget = chessPieces[targetX][targetY];
+        boolean origRedCheck = isRedInCheck;
+        boolean origBlackCheck = isBlackInCheck;
+
+        // 模拟移动
+        chessPieces[ox][oy] = null;
+        chessPieces[targetX][targetY] = piece;
+        pm.setCoord(targetX, targetY);
+
+        // 检查王见王与己方安全
+        boolean face = wouldFaceGenerals(piece, targetX, targetY);
+        updateAllPlaces();
+        checkIfInCheck();
+        boolean safe = (movingSide == Side.RED) ? !isRedInCheck : !isBlackInCheck;
+
+        // 恢复
+        chessPieces[ox][oy] = piece;
+        chessPieces[targetX][targetY] = originalAtTarget;
+        pm.setCoord(ox, oy);
+        isRedInCheck = origRedCheck;
+        isBlackInCheck = origBlackCheck;
+        updateAllPlaces();
+
+        return !face && safe;
+    }
+
+
+    public Side getOppositeSide(Side side)
+    {
+        return side == Side.RED ? Side.BLACK : Side.RED;
     }
 
 

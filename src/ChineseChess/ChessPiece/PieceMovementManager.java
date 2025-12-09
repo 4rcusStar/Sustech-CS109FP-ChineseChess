@@ -15,14 +15,8 @@ public class PieceMovementManager extends Component
 
     ChessPiece pendingEat =null;
     //
-    private enum EatState { NONE, APPROACH, HIT, FINISH }
-    private EatState eatState = EatState.NONE;
-    private float hitX, hitY;
-    private float finalX, finalY;
-    private float victimBaseX, victimBaseY;
     private Transform pendingEatTransform;
     private SpriteRenderer pendingEatSprite;
-    private double hitTimer = 0;//吃子动画
 
     @Override
     public void onAwake()
@@ -37,17 +31,6 @@ public class PieceMovementManager extends Component
     public void onStart()
     {
 
-    }
-
-    /**
-     * 逻辑上更新棋盘数据
-     */
-    private void updateBoardForMove(int x,int y)
-    {
-        chessBoardManager.setPieceAt(null,chessPieceManager.getCoordX(),chessPieceManager.getCoordY());
-        chessPieceManager.setCoord(x,y);
-        chessBoardManager.setPieceAt((ChessPiece) this.getGameObject(),x,y);
-        chessPieceManager.updateValidPlaces();
     }
 
     /**
@@ -80,10 +63,11 @@ public class PieceMovementManager extends Component
 
         pendingEatTransform = pendingEat.getComponent(Transform.class);
         pendingEatSprite = pendingEat.getComponent(SpriteRenderer.class);
+        // 记录被吃子的坐标（当前未使用，可用于动画或阴影）
         if(pendingEatTransform != null)
         {
-            victimBaseX = pendingEatTransform.getX();
-            victimBaseY = pendingEatTransform.getY();
+            pendingEatTransform.getX();
+            pendingEatTransform.getY();
         }
         if(pendingEatSprite != null)
         {
@@ -124,15 +108,10 @@ public class PieceMovementManager extends Component
             pendingMoveX = -1;
             pendingMoveY = -1;
             
-            // 如果不是吃子，移动完成后立即检查
+            // 非吃子：移动完成后统一由棋盘处理回合收尾
             if (!isEating)
             {
-                // 更新所有棋子的合法位置
-                chessBoardManager.updateAllPlaces();
-                
-                // 移动完成后检查游戏结束和将军状态
-                chessBoardManager.checkIfGameOver();
-                chessBoardManager.checkIfInCheck();
+                chessBoardManager.onMoveResolved();
             }
         }
         
@@ -142,6 +121,8 @@ public class PieceMovementManager extends Component
             // 确保吃子棋子的位置已经更新到新位置（pendingMoveX 和 pendingMoveY 已经被重置）
             onEat();
             spriteRenderer.setRenderPriority(0);
+            // 吃子完成后也需要收尾与切换回合
+            chessBoardManager.onMoveResolved();
         }
     }
 
@@ -174,9 +155,7 @@ public class PieceMovementManager extends Component
         // 吃子完成后，更新所有棋子的合法位置
         chessBoardManager.updateAllPlaces();
         
-        // 检查游戏结束（在棋子被销毁后）
         chessBoardManager.checkIfGameOver();
-        
         chessBoardManager.checkIfInCheck();
     }
 }

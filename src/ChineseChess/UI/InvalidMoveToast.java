@@ -63,13 +63,7 @@ public class InvalidMoveToast extends RendererComponent
             return;
         }
         
-        // 调试：确保render被调用
-        if (displayTime < 0.1f)
-        {
-            System.out.println("InvalidMoveToast rendering, displayTime=" + displayTime);
-        }
-        
-        // 计算透明度（淡入淡出效果）
+        // 计算透明度
         float alpha = 1.0f;
         if (displayTime < 0.2f)
         {

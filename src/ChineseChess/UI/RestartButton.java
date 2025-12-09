@@ -8,7 +8,6 @@ import javafx.scene.paint.Color;
 
 /**
  * 重新开始游戏按钮
- * 继承自 Engine.Components.Button，在游戏结束时显示
  */
 public class RestartButton extends Button
 {
