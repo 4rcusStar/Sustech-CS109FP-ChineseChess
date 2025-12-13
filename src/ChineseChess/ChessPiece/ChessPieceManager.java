@@ -72,6 +72,7 @@ public class ChessPieceManager extends Component
      */
     private void applyInfo()
     {
+    //设置贴图与默认坐标
         if(side == Side.RED)
         {
             switch(type)
@@ -80,42 +81,36 @@ public class ChessPieceManager extends Component
                 {
                     spriteRenderer.setSprite(new Image("file:src/resources/images/red-shuai.png"));
                     coordX = 4; coordY = 0;
-                    chessBoard.setPieceAt((ChessPiece) this.getGameObject(),coordX,coordY);
                 }
                 case ADVISOR ->
                 {
                     spriteRenderer.setSprite(new Image("file:src/resources/images/red-shi.png"));
                     coordX = pieceIndex == 1 ? 3 : 5;
                     coordY = 0;
-                    chessBoard.setPieceAt((ChessPiece) this.getGameObject(), coordX, coordY);
                 }
                 case ELEPHANT ->
                 {
                     spriteRenderer.setSprite(new Image("file:src/resources/images/red-xiang.png"));
                     coordX = pieceIndex == 1 ? 2 : 6;
                     coordY = 0;
-                    chessBoard.setPieceAt((ChessPiece) this.getGameObject(), coordX, coordY);
                 }
                 case HORSE ->
                 {
                     spriteRenderer.setSprite(new Image("file:src/resources/images/red-ma.png"));
                     coordX = pieceIndex == 1 ? 1 : 7;
                     coordY = 0;
-                    chessBoard.setPieceAt((ChessPiece) this.getGameObject(), coordX, coordY);
                 }
                 case ROOK ->
                 {
                     spriteRenderer.setSprite(new Image("file:src/resources/images/red-ju.png"));
                     coordX = pieceIndex == 1 ? 0 : 8;
                     coordY = 0;
-                    chessBoard.setPieceAt((ChessPiece) this.getGameObject(), coordX, coordY);
                 }
                 case CANNON ->
                 {
                     spriteRenderer.setSprite(new Image("file:src/resources/images/red-pao.png"));
                     coordX = pieceIndex == 1 ? 1 : 7;
                     coordY = 2;
-                    chessBoard.setPieceAt((ChessPiece) this.getGameObject(), coordX, coordY);
                 }
                 case SOLDIER ->
                 {
@@ -127,7 +122,6 @@ public class ChessPieceManager extends Component
                         case 4 -> { coordX = 6; coordY = 3; }
                         case 5 -> { coordX = 8; coordY = 3; }
                     }
-                    chessBoard.setPieceAt((ChessPiece) this.getGameObject(), coordX, coordY);
                 }
             }
         }
@@ -139,42 +133,36 @@ public class ChessPieceManager extends Component
                 {
                     spriteRenderer.setSprite(new Image("file:src/resources/images/black-jiang.png"));
                     coordX = 4; coordY = 9;
-                    chessBoard.setPieceAt((ChessPiece) this.getGameObject(), coordX, coordY);
                 }
                 case ADVISOR ->
                 {
                     spriteRenderer.setSprite(new Image("file:src/resources/images/black-shi.png"));
                     coordX = pieceIndex == 1 ? 3 : 5;
                     coordY = 9;
-                    chessBoard.setPieceAt((ChessPiece) this.getGameObject(), coordX, coordY);
                 }
                 case ELEPHANT ->
                 {
                     spriteRenderer.setSprite(new Image("file:src/resources/images/black-xiang.png"));
                     coordX = pieceIndex == 1 ? 2 : 6;
                     coordY = 9;
-                    chessBoard.setPieceAt((ChessPiece) this.getGameObject(), coordX, coordY);
                 }
                 case HORSE ->
                 {
                     spriteRenderer.setSprite(new Image("file:src/resources/images/black-ma.png"));
                     coordX = pieceIndex == 1 ? 1 : 7;
                     coordY = 9;
-                    chessBoard.setPieceAt((ChessPiece) this.getGameObject(), coordX, coordY);
                 }
                 case ROOK ->
                 {
                     spriteRenderer.setSprite(new Image("file:src/resources/images/black-ju.png"));
                     coordX = pieceIndex == 1 ? 0 : 8;
                     coordY = 9;
-                    chessBoard.setPieceAt((ChessPiece) this.getGameObject(), coordX, coordY);
                 }
                 case CANNON ->
                 {
                     spriteRenderer.setSprite(new Image("file:src/resources/images/black-pao.png"));
                     coordX = pieceIndex == 1 ? 1 : 7;
                     coordY = 7;
-                    chessBoard.setPieceAt((ChessPiece) this.getGameObject(), coordX, coordY);
                 }
                 case SOLDIER ->
                 {
@@ -186,19 +174,32 @@ public class ChessPieceManager extends Component
                         case 4 -> { coordX = 6; coordY = 6; }
                         case 5 -> { coordX = 8; coordY = 6; }
                     }
-                    chessBoard.setPieceAt((ChessPiece) this.getGameObject(), coordX, coordY);
                 }
             }
         }
-        spriteRenderer.setSize(80,80);
-        //
-    }
 
+        //存档覆盖坐和存货状态
+        ChineseChess.UsersAndSavingSystem.SaveData.PieceState saved =ChineseChess.UsersAndSavingSystem.SaveService.getCachedPieceState(getGameObject().getName());
+        if (saved != null)
+        {
+            if (!saved.alive)
+            {
+                getGameObject().destroy();
+                return;
+            }
+            coordX = saved.coordX;
+            coordY = saved.coordY;
+        }
+
+        spriteRenderer.setSize(80,80);
+        chessBoard.setPieceAt((ChessPiece) this.getGameObject(), coordX, coordY);
+    }
+//
     public void onStart()
     {
         float[] tPos = ChessBoardManager.coordToTransformPos(coordX,coordY);
         transform.setPosition(tPos[0],tPos[1]);
-        //设置初始可移动/吃子位置
+        //设置初始可移动|吃子位置
         updateValidPlaces();
     }
 

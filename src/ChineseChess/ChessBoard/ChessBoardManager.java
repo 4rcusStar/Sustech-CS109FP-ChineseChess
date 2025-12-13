@@ -2,6 +2,8 @@ package ChineseChess.ChessBoard;
 
 import ChineseChess.ChessPiece.*;
 import ChineseChess.UI.InvalidMoveToast;
+import ChineseChess.UsersAndSavingSystem.SaveData;
+import ChineseChess.UsersAndSavingSystem.SaveService;
 import Engine.Components.Component;
 import Engine.Components.PointerDetector;
 import Engine.Components.SpriteRenderer;
@@ -831,6 +833,30 @@ public class ChessBoardManager extends Component
         return selectedChessPiece;
     }
 
+    public ChessPiece[][] getChessPieces()
+    {
+        return chessPieces;
+    }
+
+    /**
+     * 根据存档恢复局面（棋子位置已在 ChessPieceManager.applyInfo 处理，这里保留以兼容旧流程）
+     */
+    public void applySave(SaveData data)
+    {
+        if (data == null) return;
+
+        // 恢复状态
+        currentSide = data.currentSide;
+        turnNumber = data.turnNumber;
+        isGameOver = data.isGameOver;
+        winnerSide = data.winnerSide;
+        endReason = data.endReason;
+
+        selectedChessPiece = null;
+        updateAllPlaces();
+        checkIfInCheck();
+    }
+
     /**
      * 一次移动完成后调用。检查将军、绝杀/困毙，并切换回合
      */
@@ -850,6 +876,8 @@ public class ChessBoardManager extends Component
             checkIfInCheck();
             evaluateCurrentSideLegalMoves();
         }
+        // 保存存档（计时暂用0，如有计时器可传入实际值）
+        SaveService.save(this, 0, 0, 0);
     }
 
     /**

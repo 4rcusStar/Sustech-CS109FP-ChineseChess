@@ -1,6 +1,7 @@
 package ChineseChess.UI;
 
 import ChineseChess.ChessBoard.ChessBoardManager;
+import ChineseChess.UsersAndSavingSystem.SaveService;
 import Engine.Components.Button;
 import Engine.Core.GameObject;
 import Engine.GameBuilding.GameWorldManager;
@@ -74,6 +75,9 @@ public class RestartButton extends Button
     @Override
     protected void onClick()
     {
+        // 删除存档，确保重新开始时不会加载游戏结束的状态
+        SaveService.delete();
+        
         // 强制重新创建游戏世界，清除缓存并重新构造
         GameWorldManager worldManager = GameWorldManager.getInstance();
         worldManager.recreateGameWorld("Game");

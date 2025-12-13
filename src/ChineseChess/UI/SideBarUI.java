@@ -11,5 +11,6 @@ public class SideBarUI extends GameObject
         addComponent(new WinningStatus());
         addComponent(new RestartButton());
         addComponent(new SurrenderButton());
+        addComponent(new GameTimer());
     }
 }

@@ -1,11 +1,15 @@
 package ChineseChess.Scene;
 
 import ChineseChess.ChessBoard.ChessBoard;
+import ChineseChess.ChessBoard.ChessBoardManager;
 import ChineseChess.ChessPiece.ChessPiece;
 import ChineseChess.ChessPiece.PieceType;
 import ChineseChess.ChessPiece.Side;
 import ChineseChess.UI.SideBarUI;
 import ChineseChess.UI.TurnIndicator;
+import ChineseChess.UI.GameTimer;
+import ChineseChess.UsersAndSavingSystem.SaveData;
+import ChineseChess.UsersAndSavingSystem.SaveService;
 import Engine.Core.GameObject;
 import Engine.GameBuilding.GameWorldConstructor;
 
@@ -106,5 +110,34 @@ public class ChessWorldConstructor extends GameWorldConstructor
         ChessPiece blackSoldier_5 = new ChessPiece(Side.BLACK, PieceType.SOLDIER, 5);
         chessBoard.addChild(blackSoldier_5);
         //
+
+        // 尝试加载存档（如果游戏已结束则不加载，避免重新开始时恢复游戏结束状态）
+        SaveData data = SaveService.load();
+        if (data != null && !data.isGameOver)
+        {
+            SaveService.setCachedSave(data);
+            ChessBoardManager board = chessBoard.getComponent(ChessBoardManager.class);
+            if (board != null)
+            {
+                // 这里仅恢复全局状态
+                board.applySave(data);
+            }
+            
+            // 恢复计时器时间
+            GameObject sideBarObj = root.getChild("SideBarUI");
+            if (sideBarObj != null)
+            {
+                GameTimer timer = sideBarObj.getComponent(GameTimer.class);
+                if (timer != null)
+                {
+                    timer.setTimes(data.totalMillis, data.redMillis, data.blackMillis);
+                }
+            }
+        }
+        else if (data != null && data.isGameOver)
+        {
+            // 如果存档是游戏结束状态，清除缓存，不加载
+            SaveService.setCachedSave(null);
+        }
     }
 }
