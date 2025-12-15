@@ -2,12 +2,16 @@ package Engine.GameBuilding;
 
 import Engine.Core.GameEngine;
 import Engine.Core.RenderEngine;
+import Engine.Core.GameObject;
 import Engine.Input;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import ChineseChess.ChessBoard.ChessBoardManager;
+import ChineseChess.UI.GameTimer;
+import ChineseChess.UsersAndSavingSystem.SaveService;
 
 public class GameStarter extends Application
 {
@@ -72,9 +76,20 @@ public class GameStarter extends Application
         {
             onEngineReadyCallback.run();
         }
-        //关闭窗口时，引擎也关闭
+        //关闭窗口时，保存游戏并关闭引擎
         stage.setOnCloseRequest(event ->
         {
+            // 调用当前场景的onExit()
+            GameWorld currentWorld = worldManager.getCurrentGameWorld();
+            if (currentWorld != null)
+            {
+                currentWorld.onExit();
+            }
+            
+            // 如果当前场景是游戏场景，保存游戏
+            saveGameIfNeeded(worldManager);
+            
+            // 停止引擎
             GameEngine.getInstance().stopEngine();
         });
         stage.setTitle(_title);
@@ -85,6 +100,66 @@ public class GameStarter extends Application
     public static StackPane getRootPane()
     {
         return rootPane;
+    }
+
+    /**
+     * 如果当前场景是游戏场景，保存游戏
+     */
+    private static void saveGameIfNeeded(GameWorldManager worldManager)
+    {
+        GameWorld currentWorld = worldManager.getCurrentGameWorld();
+        if (currentWorld == null)
+        {
+            return;
+        }
+
+        // 检查是否是游戏场景（ChessGameWorld）
+        String worldName = worldManager.getCurrentWorldName();
+        if (!"Game".equals(worldName))
+        {
+            return; // 不是游戏场景，不需要保存
+        }
+
+        // 获取场景根节点
+        GameObject root = currentWorld.getRoot();
+        if (root == null)
+        {
+            return;
+        }
+
+        // 查找ChessBoard
+        GameObject chessBoardObj = root.getChild("ChessBoard");
+        if (chessBoardObj == null)
+        {
+            return;
+        }
+
+        ChessBoardManager board = chessBoardObj.getComponent(ChessBoardManager.class);
+        if (board == null)
+        {
+            return;
+        }
+
+        // 如果游戏已结束，不保存
+        if (board.isGameOver())
+        {
+            return;
+        }
+
+        // 获取GameTimer的时间
+        GameObject sideBarUI = root.getChild("SideBarUI");
+        long[] times = new long[]{0, 0, 0};
+        if (sideBarUI != null)
+        {
+            GameTimer timer = sideBarUI.getComponent(GameTimer.class);
+            if (timer != null)
+            {
+                times = timer.getTimes();
+            }
+        }
+
+        // 保存游戏
+        SaveService.save(board, times[0], times[1], times[2]);
     }
 
 }

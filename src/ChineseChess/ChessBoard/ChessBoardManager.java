@@ -4,10 +4,12 @@ import ChineseChess.ChessPiece.*;
 import ChineseChess.UI.InvalidMoveToast;
 import ChineseChess.UsersAndSavingSystem.SaveData;
 import ChineseChess.UsersAndSavingSystem.SaveService;
+import Engine.Audio.AudioManager;
 import Engine.Components.Component;
 import Engine.Components.PointerDetector;
 import Engine.Components.SpriteRenderer;
 import Engine.Components.Transform;
+import Engine.Core.GameObject;
 import Engine.Input;
 import javafx.scene.image.Image;
 
@@ -431,10 +433,49 @@ public class ChessBoardManager extends Component
      */
     public void checkIfInCheck()
     {
+        // 如果游戏已结束（绝杀），不播放将军音效
+        if (isGameOver)
+        {
+            // 仍然更新状态，但不播放音效
+            updateAllPlaces();
+            checkIfBlackInCheck();
+            checkIfRedInCheck();
+            return;
+        }
+
+        boolean wasRedInCheck = isRedInCheck;
+        boolean wasBlackInCheck = isBlackInCheck;
+
         // 用新的棋盘状态进行检查
         updateAllPlaces();
         checkIfBlackInCheck();
         checkIfRedInCheck();
+
+        // 检查是否有新的将军情况
+        // 注意：在onMoveResolved()中，checkIfInCheck()会被调用两次：
+        // 1. 第一次：在switchTurn()之前，currentSide还是移动方，检查移动方是否被将军（通常不会）
+        // 2. 第二次：在switchTurn()之后，currentSide是对方，检查对方是否被将军（这才是我们要的）
+        // 
+        // 为了确保正确播放将军音效，我们检查"对方"是否被将军
+        // 如果currentSide是RED，说明轮到红方，那么检查黑方是否被将军
+        // 如果currentSide是BLACK，说明轮到黑方，那么检查红方是否被将军
+        
+        if (currentSide == Side.RED)
+        {
+            // 轮到红方，检查黑方是否被将军
+            if (!wasBlackInCheck && isBlackInCheck)
+            {
+                AudioManager.getInstance().playCheckSound();
+            }
+        }
+        else // currentSide == Side.BLACK
+        {
+            // 轮到黑方，检查红方是否被将军
+            if (!wasRedInCheck && isRedInCheck)
+            {
+                AudioManager.getInstance().playCheckSound();
+            }
+        }
     }
     private void checkIfBlackInCheck()
     {
@@ -717,6 +758,7 @@ public class ChessBoardManager extends Component
             winnerSide = isBlackGeneralExist?Side.BLACK:Side.RED;
             endReason = "General Captured";
             System.out.printf("Game Over,Winner:%s",winnerSide);
+            AudioManager.getInstance().playCheckmateSound();
         }
     }
 
@@ -811,6 +853,12 @@ public class ChessBoardManager extends Component
         winnerSide = (currentSide == Side.RED) ? Side.BLACK : Side.RED;
         endReason = inCheck ? "绝杀,无解!" : "困毙";
         System.out.printf("Game Over (%s), Winner:%s\n", endReason, winnerSide);
+        
+        // 如果是绝杀，播放绝杀音效
+        if (inCheck)
+        {
+            AudioManager.getInstance().playCheckmateSound();
+        }
     }
 
     public ChessPiece getChessPieceAt(int x, int y)
@@ -876,8 +924,9 @@ public class ChessBoardManager extends Component
             checkIfInCheck();
             evaluateCurrentSideLegalMoves();
         }
-        // 保存存档（计时暂用0，如有计时器可传入实际值）
-        SaveService.save(this, 0, 0, 0);
+        // 保存存档，从GameTimer获取实际时间
+        long[] times = getGameTimerTimes();
+        SaveService.save(this, times[0], times[1], times[2]);
     }
 
     /**
@@ -951,6 +1000,34 @@ public class ChessBoardManager extends Component
     public Side getOppositeSide(Side side)
     {
         return side == Side.RED ? Side.BLACK : Side.RED;
+    }
+
+    /**
+     * 获取GameTimer的时间数据
+     * @return [totalMillis, redMillis, blackMillis]
+     */
+    private long[] getGameTimerTimes()
+    {
+        // 向上查找场景根节点
+        GameObject root = getGameObject();
+        while (root.getParent() != null)
+        {
+            root = root.getParent();
+        }
+
+        // 查找SideBarUI
+        GameObject sideBarUI = root.getChild("SideBarUI");
+        if (sideBarUI != null)
+        {
+            ChineseChess.UI.GameTimer timer = sideBarUI.getComponent(ChineseChess.UI.GameTimer.class);
+            if (timer != null)
+            {
+                return timer.getTimes();
+            }
+        }
+
+        // 如果找不到，返回0
+        return new long[]{0, 0, 0};
     }
 
 

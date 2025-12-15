@@ -10,6 +10,7 @@ public class UserManager
     private List<User> users = new ArrayList<>();
     private User currentUser;
     private UseDataManager dataManager;
+    private boolean isGuestMode = false;
 
     private UserManager()
     {
@@ -46,6 +47,29 @@ public class UserManager
     public User getCurrentUser()
     {
         return currentUser;
+    }
+
+    /**
+     * 获取游客模式状态
+     * @return 是否处于游客模式
+     */
+    public boolean isGuestMode()
+    {
+        return isGuestMode;
+    }
+
+    /**
+     * 设置游客模式
+     * @param guestMode 是否开启游客模式
+     */
+    public void setGuestMode(boolean guestMode)
+    {
+        this.isGuestMode = guestMode;
+        if (guestMode)
+        {
+            // 游客模式下清除当前用户
+            currentUser = null;
+        }
     }
 
 
@@ -166,9 +190,9 @@ public class UserManager
      */
     public String getCurrentUserSaveDirectory()
     {
-        if(currentUser == null)
+        if(currentUser == null || isGuestMode)
         {
-            return null;
+            return null; // 游客模式或未登录用户不保存
         }
         return dataManager.getUserDirectory(currentUser.getUserUuid()) + "/saves";
     }

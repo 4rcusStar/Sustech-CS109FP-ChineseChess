@@ -2,6 +2,8 @@ package ChineseChess.UI;
 
 import ChineseChess.ChessBoard.ChessBoardManager;
 import ChineseChess.ChessPiece.Side;
+import ChineseChess.UsersAndSavingSystem.SaveData;
+import ChineseChess.UsersAndSavingSystem.SaveService;
 import Engine.Components.RendererComponent;
 import Engine.Components.Transform;
 import Engine.Core.GameObject;
@@ -49,6 +51,24 @@ public class GameTimer extends RendererComponent
         }
 
         lastUpdateTime = System.currentTimeMillis();
+    }
+
+    @Override
+    public void onStart()
+    {
+        // 从SaveData加载时间（优先使用缓存，因为ChessWorldConstructor已经加载过了）
+        SaveData data = SaveService.getCachedSave();
+        if (data == null)
+        {
+            // 如果缓存不存在，尝试直接加载
+            data = SaveService.load();
+        }
+        
+        // 如果存在存档且游戏未结束，恢复计时器时间
+        if (data != null && !data.isGameOver)
+        {
+            setTimes(data.totalMillis, data.redMillis, data.blackMillis);
+        }
     }
 
     @Override

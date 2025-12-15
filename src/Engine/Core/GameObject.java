@@ -268,7 +268,8 @@ public class GameObject
         List<RendererComponent> allRenderers = new ArrayList<>();
 
         // 先收集当前对象的渲染组件
-        for (Component component : components)
+        List<Component> componentsCopy = new ArrayList<>(components);
+        for (Component component : componentsCopy)
         {
             if (component.isEnabled() &&component.isStarted() && component instanceof RendererComponent)
             {
@@ -276,7 +277,8 @@ public class GameObject
             }
         }
         // 递归收集子对象的渲染组件
-        for (GameObject child : children)
+        List<GameObject> childrenCopy = new ArrayList<>(children);
+        for (GameObject child : childrenCopy)
         {
             allRenderers.addAll(child.collectAllRenderers());
         }

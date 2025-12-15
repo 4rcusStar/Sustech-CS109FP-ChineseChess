@@ -1,5 +1,6 @@
 package ChineseChess.ChessPiece;
 import ChineseChess.ChessBoard.ChessBoardManager;
+import Engine.Audio.AudioManager;
 import Engine.Components.Component;
 import Engine.Components.PointerDetector;
 import Engine.Components.SpriteRenderer;
@@ -102,12 +103,22 @@ public class PieceMovementManager extends Component
             chessPieceManager.setCoord(pendingMoveX, pendingMoveY);
             chessBoardManager.setPieceAt((ChessPiece) this.getGameObject(), pendingMoveX, pendingMoveY);
             chessPieceManager.updateValidPlaces();
-            
+
             boolean isEating = (pendingEat != null);
-            
+
+            // 播放移动音效
+            if (isEating)
+            {
+                AudioManager.getInstance().playCaptureSound();
+            }
+            else
+            {
+                AudioManager.getInstance().playMoveSound();
+            }
+
             pendingMoveX = -1;
             pendingMoveY = -1;
-            
+
             // 非吃子：移动完成后统一由棋盘处理回合收尾
             if (!isEating)
             {

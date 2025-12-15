@@ -130,6 +130,11 @@ public class GameEngine
 
     public void stopEngine()
     {
+        // 程序退出时调用当前场景的 onExit()
+        if(gameWorld != null)
+        {
+            gameWorld.onExit();
+        }
         isRunning = false;
     }
 }

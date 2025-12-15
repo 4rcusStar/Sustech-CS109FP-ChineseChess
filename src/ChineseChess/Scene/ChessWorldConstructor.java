@@ -12,6 +12,7 @@ import ChineseChess.UsersAndSavingSystem.SaveData;
 import ChineseChess.UsersAndSavingSystem.SaveService;
 import Engine.Core.GameObject;
 import Engine.GameBuilding.GameWorldConstructor;
+import Engine.Audio.AudioManager;
 
 public class ChessWorldConstructor extends GameWorldConstructor
 {
@@ -24,11 +25,16 @@ public class ChessWorldConstructor extends GameWorldConstructor
 
         ChessBoard chessBoard = new ChessBoard("ChessBoard");
         root.addChild(chessBoard);
-        
+
         // 添加回合指示器
         GameObject indicatorObj = new GameObject("TurnIndicator", 0, 0);
         indicatorObj.addComponent(new TurnIndicator());
         root.addChild(indicatorObj);
+
+        // 播放游戏背景音乐
+        AudioManager.getInstance().playBGM(AudioManager.BGMType.IN_GAME);
+
+        System.out.println("ChessWorldConstructor: Construction completed for root: " + root.getName());
 
         // 红方棋子
         ChessPiece redGeneral = new ChessPiece(Side.RED, PieceType.GENERAL, 0);
@@ -140,4 +146,5 @@ public class ChessWorldConstructor extends GameWorldConstructor
             SaveService.setCachedSave(null);
         }
     }
+
 }

@@ -12,5 +12,6 @@ public class SideBarUI extends GameObject
         addComponent(new RestartButton());
         addComponent(new SurrenderButton());
         addComponent(new GameTimer());
+        addComponent(new UserNameDisplay()); // 添加用户名显示组件
     }
 }

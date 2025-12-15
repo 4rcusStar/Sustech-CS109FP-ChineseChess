@@ -20,6 +20,7 @@ public class UserSelectWorld extends GameWorld
     private PasswordField passwordField;
     private Button loginButton;
     private Button registerButton;
+    private Button guestButton; //游客模式按钮
     private Label errorLabel; //错误提示标签
     private UserManager userManager = UserManager.getInstance();
 
@@ -90,13 +91,13 @@ public class UserSelectWorld extends GameWorld
             clearError();
             String username = usernameField.getText().trim();
             String password = passwordField.getText();
-            
+
             if(username.isEmpty() || password.isEmpty())
             {
                 showError("请输入用户名和密码");
                 return;
             }
-            
+
             if(userManager.registerUser(username, password))
             {
                 userManager.login(username, password);
@@ -107,13 +108,24 @@ public class UserSelectWorld extends GameWorld
                 showError("注册失败，用户名已存在");
             }
         });
+
+        //创建游客模式按钮
+        guestButton = new Button("游客模式进入游戏");
+        guestButton.setPrefWidth(200);
+        guestButton.setOnAction(event ->
+        {
+            clearError();
+            // 设置游客模式
+            userManager.setGuestMode(true);
+            GameWorldManager.getInstance().switchGameWorldTo("MainMenu");
+        });
         
         //创建错误提示标签
         errorLabel = new Label();
         errorLabel.setStyle("-fx-text-fill: red;");
         
         //添加所有控件到容器
-        container.getChildren().addAll(usernameField, passwordField, loginButton, registerButton, errorLabel);
+        container.getChildren().addAll(usernameField, passwordField, loginButton, registerButton, guestButton, errorLabel);
         
         //将容器添加到rootPane
         rootPane.getChildren().add(container);
@@ -132,6 +144,7 @@ public class UserSelectWorld extends GameWorld
         passwordField = null;
         loginButton = null;
         registerButton = null;
+        guestButton = null;
         errorLabel = null;
         super.onExit();
     }
