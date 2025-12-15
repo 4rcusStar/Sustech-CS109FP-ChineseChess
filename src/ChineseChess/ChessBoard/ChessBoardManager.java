@@ -64,6 +64,9 @@ public class ChessBoardManager extends Component
     private String endReason = null;
     
     private InvalidMoveToast invalidMoveToast;
+    
+    // 当前残影对象（全局只有一个）
+    private PieceGhost currentGhost;
 
     /**
      * 返回胜利方，如果游戏没有结束，返回null
@@ -134,6 +137,9 @@ public class ChessBoardManager extends Component
         transform = getGameObject().getComponent(Transform.class);
         spriteRenderer = getGameObject().getComponent(SpriteRenderer.class);
         pointerDetector = getGameObject().getComponent(PointerDetector.class);
+        
+        // 清除任何残留的残影
+        destroyCurrentGhost();
         spriteRenderer.setRenderPriority(-999);
         boardCount++;
         System.out.printf("boardCount: %d\n",boardCount);
@@ -1028,6 +1034,83 @@ public class ChessBoardManager extends Component
 
         // 如果找不到，返回0
         return new long[]{0, 0, 0};
+    }
+
+    /**
+     * 创建残影
+     * @param piece 要创建残影的棋子
+     */
+    public void createGhost(ChessPiece piece)
+    {
+        // 销毁当前残影
+        destroyCurrentGhost();
+
+        // 获取棋子的sprite和位置
+        SpriteRenderer pieceSpriteRenderer = piece.getComponent(SpriteRenderer.class);
+        Transform pieceTransform = piece.getComponent(Transform.class);
+        
+        if (pieceSpriteRenderer == null || pieceTransform == null)
+        {
+            System.out.println("createGhost: pieceSpriteRenderer or pieceTransform is null");
+            return;
+        }
+
+        Image sprite = pieceSpriteRenderer.getSprite();
+        if (sprite == null)
+        {
+            System.out.println("createGhost: sprite is null");
+            return;
+        }
+
+        // 获取棋子的当前位置（移动前的原位置）
+        float ghostX = pieceTransform.getX();
+        float ghostY = pieceTransform.getY();
+        float ghostWidth = (float)pieceSpriteRenderer.getWidth();
+        float ghostHeight = (float)pieceSpriteRenderer.getHeight();
+
+        System.out.println("createGhost: Creating ghost at (" + ghostX + ", " + ghostY + ") with size (" + ghostWidth + ", " + ghostHeight + ")");
+
+        // 创建残影
+        currentGhost = new PieceGhost(sprite, ghostX, ghostY, ghostWidth, ghostHeight);
+        
+        // 将残影添加到棋盘（ChessBoard GameObject）
+        GameObject chessBoard = getGameObject();
+        chessBoard.addChild(currentGhost);
+        
+        // 应用父子关系（确保残影被添加到children列表）
+        chessBoard.applyPendingRelation();
+        
+        // 手动初始化残影（确保awake和start被调用）
+        currentGhost.awake();
+        currentGhost.start();
+        
+        // 验证残影的组件（在start之后再次设置位置，确保位置正确）
+        SpriteRenderer ghostRenderer = currentGhost.getComponent(SpriteRenderer.class);
+        Transform ghostTransform = currentGhost.getComponent(Transform.class);
+        if (ghostRenderer != null && ghostTransform != null)
+        {
+            // 再次设置位置，确保位置正确（因为start可能会重置某些状态）
+            ghostTransform.setPosition(ghostX, ghostY);
+            System.out.println("createGhost: Ghost created successfully. RenderPriority=" + ghostRenderer.getRenderPriority() + 
+                             ", Opacity=" + ghostRenderer.getOpacity() + 
+                             ", Position=(" + ghostTransform.getX() + ", " + ghostTransform.getY() + ")");
+        }
+        else
+        {
+            System.out.println("createGhost: ERROR - Ghost components not found!");
+        }
+    }
+
+    /**
+     * 销毁当前残影
+     */
+    public void destroyCurrentGhost()
+    {
+        if (currentGhost != null)
+        {
+            currentGhost.destroy();
+            currentGhost = null;
+        }
     }
 
 

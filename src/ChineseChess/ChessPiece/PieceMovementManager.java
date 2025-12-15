@@ -42,6 +42,9 @@ public class PieceMovementManager extends Component
      */
     public synchronized void moveTo(int x,int y,float velocity)
     {
+        // 在移动开始前，创建残影（记录原位置）
+        chessBoardManager.createGhost((ChessPiece) this.getGameObject());
+        
         float[] tPos = ChessBoardManager.coordToTransformPos(x,y);
         //通知棋盘和棋子更新数据,移动
         chessBoardManager.setPieceAt(null,chessPieceManager.getCoordX(),chessPieceManager.getCoordY());
