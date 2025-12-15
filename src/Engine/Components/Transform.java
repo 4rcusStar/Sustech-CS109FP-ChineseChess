@@ -24,19 +24,11 @@ public class Transform extends Component
         this.y = y;
     }
 
-    /**
-     *
-     * @return x坐标
-     */
     public float getX()
     {
         return x;
     }
 
-    /**
-     *
-     * @return y坐标
-     */
     public float getY()
     {
         return y;
@@ -98,19 +90,11 @@ public class Transform extends Component
         isMoving = true;
     }
 
-    /**
-     *
-     * @return 该物体是否正在执行moveTo()
-     */
     public boolean isMoving()
     {
         return isMoving;
     }
 
-    /**
-     *
-     * @return 该Transform的父Transform
-     */
     public Transform getParent()
     {
         return parent;
@@ -149,37 +133,6 @@ public class Transform extends Component
         float easeOutScale = 1-(1-scaleWithTime)*(1-scaleWithTime);
         x = startX + easeOutScale * xDistance;
         y = startY + easeOutScale * yDistance;
-       /* // 将毫秒转换为秒
-        double deltaSeconds = deltaMs / 1000.0;
-
-        float dx = targetX - x;
-        float dy = targetY - y;
-        double distanceRemain = Math.sqrt(dx * dx + dy * dy);
-        if (distanceRemain <= 0.0001)
-        {
-            x = targetX;
-            y = targetY;
-            isMoving = false;
-            return;
-        }
-        // 计算本帧应移动的距离（像素）
-        double moveDist = movingVelocity * deltaSeconds;
-
-        // 如果帧移动距离大于剩余距离，直接到达终点
-        if (moveDist >= distanceRemain)
-        {
-            x = targetX;
-            y = targetY;
-            isMoving = false;
-            return;
-        }
-
-        // 规范化方向向量并移动
-        double nx = dx / distanceRemain;
-        double ny = dy / distanceRemain;
-
-        x += (float) (nx * moveDist);
-        y += (float) (ny * moveDist);*/
     }
 }
 

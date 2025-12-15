@@ -32,14 +32,14 @@ public class ChessBoardManager extends Component
     private ChessPiece[][] chessPieces = new ChessPiece[9][10];
     private ChessPiece selectedChessPiece;
 
-    private final List<int[]> allPlaces = new LinkedList<>();//表示所有格点
-    private List<int[]> movablePlaces = new LinkedList<>();//当有被选中的棋子时，该变量为棋子可移动至的格点
+    private final List<int[]> allPlaces = new LinkedList<>();
+    private List<int[]> movablePlaces = new LinkedList<>();
     private List<int[]> eatablePlaces = new LinkedList<>();
 
     private boolean isMouseInChessBoard = false;
 
     private Side currentSide = Side.RED;
-    private int turnNumber = 1; // 当前回合数（红方先手为第1回合）
+    private int turnNumber = 1;
 
     public boolean isBlackInCheck()
     {
@@ -64,8 +64,6 @@ public class ChessBoardManager extends Component
     private String endReason = null;
     
     private InvalidMoveToast invalidMoveToast;
-    
-    // 当前残影对象（全局只有一个）
     private PieceGhost currentGhost;
 
     /**
@@ -137,8 +135,6 @@ public class ChessBoardManager extends Component
         transform = getGameObject().getComponent(Transform.class);
         spriteRenderer = getGameObject().getComponent(SpriteRenderer.class);
         pointerDetector = getGameObject().getComponent(PointerDetector.class);
-        
-        // 清除任何残留的残影
         destroyCurrentGhost();
         spriteRenderer.setRenderPriority(-999);
         boardCount++;
@@ -150,13 +146,12 @@ public class ChessBoardManager extends Component
         spriteRenderer.setSprite(sprite);
         spriteRenderer.setSize(800, 800);
         
-        // 创建无效移动提示浮框
         Engine.Core.GameObject toastObj = new Engine.Core.GameObject("InvalidMoveToast", 0, 0);
         invalidMoveToast = new InvalidMoveToast();
         toastObj.addComponent(invalidMoveToast);
         getGameObject().addChild(toastObj);
         System.out.println("InvalidMoveToast created and added to ChessBoard");
-        //构造格点
+        
         for (int i = 0; i < 9; i++)
         {
             for (int j = 0; j < 10; j++)
@@ -165,23 +160,14 @@ public class ChessBoardManager extends Component
             }
         }
         
-        // 开局检查一次合法步（极端残局）
         checkIfInCheck();
         evaluateCurrentSideLegalMoves();
     }
 
-    /**
-     *
-     * @param coordX 棋盘坐标X
-     * @param coordY 棋盘坐标Y
-     * @return float[0]:像素坐标X,float[1]:像素坐标Y
-     */
     public static float[] coordToTransformPos(int coordX, int coordY)
     {
-        // 基准点
         final float baseX = 81.6f;
         final float baseY = 52.0f;
-        // 步长
         final float stepX = 79.9f;
         final float stepY = 77.8f;
 
@@ -255,13 +241,11 @@ public class ChessBoardManager extends Component
             ChessPiece pointedPiece = getChessPieceAt(pointingX, pointingY);
             boolean isJustEaten = false;
             boolean isJustMoved = false;
-            // 情况一：当前没有选中的棋子
             if (selectedChessPiece == null)
             {
                 if (pointedPiece != null)
                 {
                     ChessPieceManager pManager = pointedPiece.getComponent(ChessPieceManager.class);
-                    // 只有在当前回合一方时才允许选中
                     if (pManager != null && pManager.getSide() == currentSide)
                     {
                         selectedChessPiece = pointedPiece;
@@ -276,18 +260,15 @@ public class ChessBoardManager extends Component
                 }
                 else
                 {
-                    // 点在空格上，取消选中
                     selectedChessPiece = null;
                     movablePlaces.clear();
                     eatablePlaces.clear();
                 }
                 updateAllPlaces();
             }
-            // 情况二：已经有选中的棋子
             else
             {
                 ChessPieceManager selectedManager = selectedChessPiece.getComponent(ChessPieceManager.class);
-                // 如果当前选中的棋子不属于当前回合，则先按无选中重新处理本次点击
                 if (selectedManager == null || selectedManager.getSide() != currentSide)
                 {
                     selectedChessPiece = null;
@@ -307,13 +288,11 @@ public class ChessBoardManager extends Component
                 }
                 else
                 {
-                    // 走子
                     if (pointedPlace != null && movablePlaces.contains(pointedPlace))
                     {
                         // 先检查是否会王见王
                         if (wouldFaceGenerals(selectedChessPiece, pointedPlace[0], pointedPlace[1]))
                         {
-                            // 会王见王阻止移动
                             if (invalidMoveToast != null)
                             {
                                 invalidMoveToast.show();
@@ -322,7 +301,6 @@ public class ChessBoardManager extends Component
                         // 再检查是否会送将
                         else if (wouldExposeGeneral(selectedChessPiece, pointedPlace[0], pointedPlace[1], false))
                         {
-                            // 会送将，阻止移动
                             if (invalidMoveToast != null)
                             {
                                 invalidMoveToast.show();
@@ -334,7 +312,6 @@ public class ChessBoardManager extends Component
                             isJustMoved = true;
                         }
                     }
-                    // 吃子逻辑
                     else if (pointedPlace != null && eatablePlaces.contains(pointedPlace))
                     {
                         // 先检查是否会王见王
@@ -348,7 +325,6 @@ public class ChessBoardManager extends Component
                         // 再检查是否会送将
                         else if (wouldExposeGeneral(selectedChessPiece, pointedPlace[0], pointedPlace[1], true))
                         {
-                            // 会送将，显示提示并阻止移动
                             System.out.println("Invalid eat detected: would expose general");
                             if (invalidMoveToast != null)
                             {
@@ -361,7 +337,6 @@ public class ChessBoardManager extends Component
                             isJustEaten = true;
                         }
                     }
-                    // 切换
                     else if (pointedPiece != null)
                     {
                         ChessPieceManager pManager = pointedPiece.getComponent(ChessPieceManager.class);
@@ -373,7 +348,6 @@ public class ChessBoardManager extends Component
                         }
                     }
 
-                    // 若刚刚完成操作，则取消选中
                     if (isJustEaten||isJustMoved)
                     {
                         selectedChessPiece = null;
@@ -416,7 +390,6 @@ public class ChessBoardManager extends Component
     {
         float mouseX = (float) Input.getMouseX();
         float mouseY = (float) Input.getMouseY();
-        //检测鼠标是否在界外,若在界外则不更新坐标
         isMouseInChessBoard = !(mouseX > 800 || mouseX < 0 || mouseY > 800 || mouseY < 0);
         if (isMouseInChessBoard)
         {
@@ -1062,7 +1035,6 @@ public class ChessBoardManager extends Component
             return;
         }
 
-        // 获取棋子的当前位置（移动前的原位置）
         float ghostX = pieceTransform.getX();
         float ghostY = pieceTransform.getY();
         float ghostWidth = (float)pieceSpriteRenderer.getWidth();
@@ -1070,26 +1042,18 @@ public class ChessBoardManager extends Component
 
         System.out.println("createGhost: Creating ghost at (" + ghostX + ", " + ghostY + ") with size (" + ghostWidth + ", " + ghostHeight + ")");
 
-        // 创建残影
         currentGhost = new PieceGhost(sprite, ghostX, ghostY, ghostWidth, ghostHeight);
         
-        // 将残影添加到棋盘（ChessBoard GameObject）
         GameObject chessBoard = getGameObject();
         chessBoard.addChild(currentGhost);
-        
-        // 应用父子关系（确保残影被添加到children列表）
         chessBoard.applyPendingRelation();
-        
-        // 手动初始化残影（确保awake和start被调用）
         currentGhost.awake();
         currentGhost.start();
         
-        // 验证残影的组件（在start之后再次设置位置，确保位置正确）
         SpriteRenderer ghostRenderer = currentGhost.getComponent(SpriteRenderer.class);
         Transform ghostTransform = currentGhost.getComponent(Transform.class);
         if (ghostRenderer != null && ghostTransform != null)
         {
-            // 再次设置位置，确保位置正确（因为start可能会重置某些状态）
             ghostTransform.setPosition(ghostX, ghostY);
             System.out.println("createGhost: Ghost created successfully. RenderPriority=" + ghostRenderer.getRenderPriority() + 
                              ", Opacity=" + ghostRenderer.getOpacity() + 
@@ -1101,9 +1065,6 @@ public class ChessBoardManager extends Component
         }
     }
 
-    /**
-     * 销毁当前残影
-     */
     public void destroyCurrentGhost()
     {
         if (currentGhost != null)

@@ -105,16 +105,9 @@ public class SpriteRenderer extends RendererComponent
         return sprite;
     }
 
-    /**
-     * 渲染图标，若图标确实，则显示为紫色
-     *
-     * @param gc GraphicsContext画笔
-     */
     public void render(GraphicsContext gc)
     {
         Transform t = getGameObject().getComponent(Transform.class);
-        
-        // 保存当前全局透明度
         double originalGlobalAlpha = gc.getGlobalAlpha();
         gc.setGlobalAlpha(opacity);
         
@@ -127,7 +120,6 @@ public class SpriteRenderer extends RendererComponent
             gc.drawImage(sprite, t.getX()+pivotX, t.getY()+pivotY, width*scaleX, height*scaleY);
         }
         
-        // 恢复原始全局透明度
         gc.setGlobalAlpha(originalGlobalAlpha);
     }
 }

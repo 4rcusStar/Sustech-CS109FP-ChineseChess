@@ -11,17 +11,17 @@ import java.util.List;
 
 public class GameObject
 {
-    private List<Component> components = new ArrayList<Component>();//该Object包含的所有的组件
-    private String name;//该Object的名字
+    private List<Component> components = new ArrayList<Component>();
+    private String name;
 
-    private GameObject parent;//该GameObject的父GameObject
-    private List<GameObject> children = new ArrayList<>();//该GameObject的子GameObject
+    private GameObject parent;
+    private List<GameObject> children = new ArrayList<>();
 
-    private GameObject pendingParent;//待加入/变更的父OBJ
-    private List<GameObject> pendingChildren = new ArrayList<>();//待加入的子OBJ
+    private GameObject pendingParent;
+    private List<GameObject> pendingChildren = new ArrayList<>();
 
-    private boolean isAwaken=false;//是否已经调用过awake()
-    private boolean isStarted=false;//是否已经调用过start()
+    private boolean isAwaken=false;
+    private boolean isStarted=false;
     private boolean isEnabled=true;
     private boolean pendingDestroy=false;
 
@@ -30,7 +30,6 @@ public class GameObject
         this.name = name;
         Transform transform= new Transform();
         this.addComponent(transform);
-        //
     }
 
     /**
@@ -46,10 +45,6 @@ public class GameObject
         this.addComponent(transform);
     }
 
-    /**
-     * 获取GameObject的name
-     * @return GameObject.name
-     */
     public String getName()
     {
         return name;
@@ -80,17 +75,12 @@ public class GameObject
         pendingDestroy=true;
     }
 
-    /**
-     * 在每帧的开始应用父子设置关系
-     */
-     public void applyPendingRelation()
+    public void applyPendingRelation()
     {
         for(GameObject child:pendingChildren)
         {
-            //如果child为空或者children中已经有child则不执行代码
             if(child==null||children.contains(child))
                 return;
-            //如果child已经有了一个parent，则移除原parent，添加本对象为parent
             if(child.parent!=null)
             {
                 child.parent.children.remove(child);
@@ -124,11 +114,6 @@ public class GameObject
         }
     }
 
-    /**
-     * 通过name获取子一层GameObject
-     * @param name 目标的name
-     * @return 目标GameObject,若找不到则返回null
-     */
     public GameObject getChild(String name)
     {
         for(GameObject child:children)
@@ -140,10 +125,6 @@ public class GameObject
     }
 
 
-    /**
-     * 向GameObject添加组件
-     * @param component 要添加的组件
-     */
     public void addComponent(Component component)
     {
         component.setGameObject(this);
@@ -185,21 +166,12 @@ public class GameObject
         isEnabled = enabled;
     }
 
-    /**
-     * 该GameObject是否enabled
-     * @return isEnabled
-     */
     public boolean isEnabled(){return isEnabled;}
 
-    /**
-     * 获得所有组件的列表
-     * @return 所有组件的列表
-     */
     public List<Component> getAllComponents()
     {
         return components;
     }
-    //----------GameObject游戏循环管理------------
     public void awake()
     {
         for(Component component : components)
@@ -207,7 +179,6 @@ public class GameObject
             component.awake();
             component.markAwaken();
         }
-        //让子Object调用awake()
         for(GameObject child : new ArrayList<>(children))
         {
             child.awake();
@@ -220,7 +191,6 @@ public class GameObject
             component.start();
             component.markStarted();
         }
-        //子O调用
         for(GameObject child : new ArrayList<>(children))
         {
             child.start();
@@ -243,10 +213,6 @@ public class GameObject
         }
     }
 
-    /**
-     * 渲染引擎调用渲染
-     * @param gc
-     */
     public void render(GraphicsContext gc)
     {
         for (Component component : components)
@@ -262,12 +228,9 @@ public class GameObject
         }
     }
 
-    // 收集所有RendererComponent
     public List<RendererComponent> collectAllRenderers()
     {
         List<RendererComponent> allRenderers = new ArrayList<>();
-
-        // 先收集当前对象的渲染组件
         List<Component> componentsCopy = new ArrayList<>(components);
         for (Component component : componentsCopy)
         {
@@ -276,7 +239,6 @@ public class GameObject
                 allRenderers.add((RendererComponent) component);
             }
         }
-        // 递归收集子对象的渲染组件
         List<GameObject> childrenCopy = new ArrayList<>(children);
         for (GameObject child : childrenCopy)
         {
